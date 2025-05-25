@@ -23,7 +23,7 @@ public class UserDTO
     private String firstName;                                                               //Field to store the user's firstName
 
     @NotBlank(message = "Last name is required")                                            //Validates that username is not null or empty
-    @Size(min = 4, max = 20, message = "Username must be between 4 and 30 characters")      //Validates username length
+    @Size(min = 4, max = 20, message = "Username must be between 4 and 20 characters")      //Validates username length
     private String lastName;                                                                //Field to store the user's lastName
 
     @NotBlank(message = "Username is required")                                             //Validates that username is not null or empty

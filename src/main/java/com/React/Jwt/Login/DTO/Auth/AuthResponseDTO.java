@@ -14,6 +14,6 @@ import lombok.Setter;                   //Generates setters for all fields
 public class AuthResponseDTO 
 {
     private Long userId;    //User id for response
-    private String firstName, lastName, phone, address, email, username, password, token, message;  //User info with token and message for response
+    private String firstName, lastName, phone, address, email, username, token, message;  //User info with token and message for response
     private Role role;      //User role for response
 }
