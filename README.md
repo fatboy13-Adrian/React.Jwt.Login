@@ -28,25 +28,25 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 
 ## Installation Procedures
 1. **Clone Repository**<br>
-    git clone https://github.com/yourusername/ums.git
+    git clone https://github.com/yourusername/React.Jwt.Login.git
 
 2. **Navigate to Project Repository**<br>
-    cd ums
+    cd React.Jwt.Login
 
 3. **Install Dependencies for React Frontend**<br>
-    cd react-frontend
+    cd frontend
     npm install axios<br>
     npm install react-router-dom<br>
 
 ## Startup Procedures
 1. **Startup Backend**<br>
-    -   cd ums<br>
+    -   cd React.Jwt.Login<br>
     -   mvn clean install<br>
     -   mvn spring-boot:run<br>
 
 2. **Startup Frontend (Wait for 3 to 5 seconds after starting up the Backend)**<br>
     -   open a new terminal in VSCode<br>
-    -   cd react-frontend<br>
+    -   cd frontend<br>
     -   npm start<br>
 
 ## 🔐 Authentication Flow
