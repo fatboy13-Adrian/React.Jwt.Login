@@ -1,0 +1,36 @@
+.text-field-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+  gap: 1rem;
+}
+
+.text-field-label {
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+  min-width: 120px;
+  text-align: right;
+}
+
+.text-field-input {
+  flex: 1;
+  padding: 0.5rem 0.75rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.text-field-input:focus {
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  outline: none;
+}
+
+.text-field-input:disabled {
+  background-color: #f5f5f5;
+  border-color: #ddd;
+  color: #888;
+  cursor: not-allowed;
+}

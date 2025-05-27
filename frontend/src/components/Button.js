@@ -1,17 +1,17 @@
-import React from "react";  //Import the React library to use JSX and React features
+import React from "react";                  //Import React for JSX support
+import "../styles/Button.css";              //Import external CSS for styling
 
-//Export a functional component named Button with destructured props
-export default function Button({type = "button", onClick, disabled = false, children, className = "",}) 
+//Define reusable Button component with props
+export default function Button({             type = "button", onClick, disabled = false, children, className = "",}) 
 {
-  //Return the JSX for rendering the button element
   return (
     <button
-      type={type}                           //Set the button's type attribute
-      onClick={onClick}                     //Attach the click event handler
-      disabled={disabled}                   //Set the button's disabled attribute
-      className={`custom-btn ${className}`} //Combine default and custom CSS classes
+      type={type}                           //Set button type attribute
+      onClick={onClick}                     //Attach onClick event handler
+      disabled={disabled}                   //Set disabled attribute if true
+      className={`custom-btn ${className}`} //Apply base and additional CSS classes
     >
-      {children}                            //Render any children passed between Button tags
+      {children}                            //Render button content (text or elements)
     </button>
   );
 }
