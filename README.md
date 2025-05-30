@@ -32,7 +32,7 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
     cd React.Jwt.Login
 
 3. **Install Dependencies for React Frontend**<br>
-    cd frontend
+    cd frontend<br>
     npm install axios<br>
     npm install react-router-dom<br>
 
