@@ -1,57 +1,59 @@
-import { Routes, Route, Navigate } from "react-router-dom";             //Routing components
-import ProtectedRoute from "../components/Auth/ProtectedRoute";         //Authentication guard for protected routes
-import Login from "../pages/Login";                                     //Login page
-import ForgotLoginCredential from "../pages/ForgotLoginCredentials";    //Forgot login credentials page
-import RegisterNewUser from "../pages/RegisterNewUser";                 //User registration page
-import ViewUserDashboard from "../pages/ViewUserDashboard";             //View user dashboard page
-import UpdateUserProfile from "../pages/UpdateUserProfile";             //Update user profile page
+import React from "react";                                          //Importing React for JSX functionality
+import { Routes, Route, Navigate } from "react-router-dom";         //Importing necessary components from react-router-dom for routing
+import Login from "../pages/Login";                                 //Import Login page
+import ForgotLoginCredential from "../pages/ForgotLoginCredential"; //Import ForgotLoginCredential page
+import RegisterNewUser from "../pages/RegisterNewUser";             //Import RegisterNewUser page
+import ViewUserDashboard from "../pages/ViewUserDashboard";         //Import ViewUserDashboard page
+import UpdateUserProfile from "../pages/UpdateUserProfile";         //Import UpdateUserProfile page
+import ProtectedRoute from "./ProtectedRoute";                      //Import the ProtectedRoute component to protect certain routes
 
+//Default export for AppRoutes function component that handles routing logic
 export default function AppRoutes() 
 {
   return (
-    <Routes future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-      {/*Public Routes*/}
-      <Route path="/" element={<Navigate to="/login" replace />} />         {/*Redirect root to login*/}
-      <Route path="/login" element={<Login />} />                           {/*Login*/}
-      <Route path="/forgot-login" element={<ForgotLoginCredential />} />    {/*Forgot login*/}
-      <Route path="/create-user" element={<RegisterNewUser />} />           {/*Register user*/}
+    <Routes>
+      {/*Public routes*/}
+      <Route path="/" element={<Navigate to="/login" replace />} />                 {/*Redirect the root path ("/") to the login page*/}
+      <Route path="/login" element={<Login />} />                                   {/*Login route, renders Login page*/}
+      <Route path="/forgot-login-credential" element={<ForgotLoginCredential />} /> {/*Forgot Login Credential route, renders ForgotLoginCredential page*/}
+      <Route path="/register-new-user" element={<RegisterNewUser />} />             {/*Register route, renders RegisterNewUser page*/}
 
-      {/*Protected Routes*/}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>                                          {/*Authenticated users only*/}
-            <ViewUserDashboard />                                   {/*Dashboard*/}
+      {/*Protected routes*/}
+      <Route 
+        path="/dashboard" 
+        element={ 
+          <ProtectedRoute>    {/*Protected route that wraps ViewUserDashboard component*/}
+            <ViewUserDashboard /> 
           </ProtectedRoute>
-        }
+        } 
       />
-      <Route
-        path="/admin"
-        element={
-          <ProtectedRoute>
-            <ViewUserDashboard />                                   {/*Admin dashboard (same component)*/}
+      <Route 
+        path="/admin" 
+        element={ 
+          <ProtectedRoute>    {/*Protected route that wraps ViewUserDashboard component for admin*/}
+            <ViewUserDashboard /> 
           </ProtectedRoute>
-        }
+        } 
       />
-      <Route
-        path="/profile"
-        element={
-          <ProtectedRoute>
-            <ViewUserDashboard />                                   {/*Profile view (reuse dashboard)*/}
+      <Route 
+        path="/profile" 
+        element={ 
+          <ProtectedRoute>    {/*Protected route that wraps ViewUserDashboard component for profile view*/}
+            <ViewUserDashboard /> 
           </ProtectedRoute>
-        }
+        } 
       />
-      <Route
-        path="/update-user/:userId"
-        element={
-          <ProtectedRoute>
-            <UpdateUserProfile />                                   {/*Update user with param*/}
+      <Route 
+        path="/update-user-profile/:userId" 
+        element={ 
+          <ProtectedRoute>    {/*Protected route that wraps UpdateUserProfile component*/}
+            <UpdateUserProfile /> 
           </ProtectedRoute>
-        }
+        } 
       />
 
-      {/*Catch-all*/}
-      <Route path="*" element={<Navigate to="/login" replace />} /> {/*Redirect unknown paths*/}
+      {/*Fallback route*/}
+      <Route path="*" element={<Navigate to="/login" replace />} /> {/*Redirect all unmatched routes to login*/}
     </Routes>
   );
 }

@@ -1,25 +1,27 @@
-import React from "react";        //Import React for JSX support
-import "../styles/TextField.css"; //Import TextField styles
+import React from "react";        //Importing React for JSX
+import "../styles/TextField.css"; //Importing custom CSS for styling
 
-export default function TextField({name, label, type = "text", value, onChange, required = false, maxLength, minLength, autoComplete, disabled,}) 
+//The TextField component accepts several props for customizable behavior
+export default function TextField({id, label, name, type = "text", value, onChange, autoComplete, disabled = false, required = false, className = ""}) 
 {
   return (
-    <div className="text-field-row">  {/*container for label and input*/}
-      <label htmlFor={name} className="text-field-label">
-        {label}
-      </label>
+    //Wrapper div for the form layout, arranging the label and input in a row
+    <div className="form-row">
+      
+      {/*Label element associated with the input via 'htmlFor'*/}
+      <label htmlFor={id} className="form-label">{label}</label>
+      
+      {/*Input field with multiple customizable attributes*/}
       <input
-        id={name}                     //link input to label
-        name={name}                   //form input name
-        type={type}                   //input type
-        value={value}                 //controlled value
-        onChange={onChange}           //onChange handler
-        required={required}           //required validation
-        maxLength={maxLength}         //max length limit
-        minLength={minLength}         //min length limit
-        autoComplete={autoComplete}   //browser autocomplete
-        disabled={disabled}           //disable input if true
-        className="text-field-input"
+        id={id}                                       //Setting the 'id' for the input element
+        name={name}                                   //Setting the 'name' for form submission
+        type={type}                                   //Input field type, can be text, password, email, etc.
+        value={value}                                 //Value of the input, passed from parent component
+        onChange={onChange}                           //Event handler to update the value on change
+        disabled={disabled}                           //Whether the input is disabled
+        autoComplete={autoComplete}                   //Auto-complete attribute for browser behavior
+        required={required}                           //Whether the input is required for form submission
+        className={`form-input ${className}`.trim()}  //Class names for styling, including custom ones
       />
     </div>
   );

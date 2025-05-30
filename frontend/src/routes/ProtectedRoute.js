@@ -1,15 +1,17 @@
-import React from 'react';                              //Import React library for JSX support
-import { Navigate } from 'react-router-dom';            //Import Navigate from React Router to handle redirection
-import { useAuth } from '../../context/AuthContext';    //Import custom authentication context hook to access auth state
+import React from "react";                        //Importing React for JSX functionality
+import {Navigate} from "react-router-dom";        //Import Navigate from react-router-dom to handle redirection
+import {useAuth} from "../context/AuthContext";   //Import useAuth hook to access authentication state
 
-//Define and export the ProtectedRoute component in one step
-export default function ProtectedRoute({ children }) 
+//Default export for the ProtectedRoute component function
+export default function ProtectedRoute({children}) 
 {
-  const { isAuthenticated } = useAuth();        //Get the isAuthenticated value from context
+  //Using useAuth hook to access authentication state from context
+  const {isAuthenticated} = useAuth();    //Destructure 'isAuthenticated' to check if the user is logged in
 
-  //If the user is not authenticated, redirect to login
-  if(!isAuthenticated)
-    return <Navigate to="/login" replace />;    //Use 'replace' to avoid adding to browser history
-
-  return children;                              //If authenticated, render the protected child components
+  //Return the children (protected component) if the user is authenticated
+  return isAuthenticated ? (
+    children                              //If authenticated, render the children passed to this component
+  ) : (
+    <Navigate to="/login" replace />      //If not authenticated, redirect to the login page
+  );
 }

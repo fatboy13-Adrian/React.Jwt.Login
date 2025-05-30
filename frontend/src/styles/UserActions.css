@@ -1,21 +1,34 @@
-.user-actions {
+.user-actions 
+{
   display: flex;
-  gap: 1rem;
-  justify-content: flex-end;
-  margin-top: 1rem;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  width: 100%;
+  box-sizing: border-box;
 }
 
-.delete-btn {
-  background-color: #dc3545;
-  color: #fff;
+.user-actions button:hover:not(:disabled) 
+{
+  background-color: #0056b3;
 }
 
-.delete-btn:hover:not(:disabled) {
-  background-color: #c82333;
+.user-actions .delete-btn 
+{
+  border: 1px solid #d9534f;
+  background-color: transparent;
+  color: #d9534f;
 }
 
-.delete-btn:disabled {
-  background-color: #f5b5b8;
-  color: #fff;
+.user-actions .delete-btn:hover:not(:disabled) 
+{
+  background-color: #d9534f;
+  color: white;
+}
+
+.user-actions button:disabled 
+{
+  opacity: 0.6;
   cursor: not-allowed;
 }

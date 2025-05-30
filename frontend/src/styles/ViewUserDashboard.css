@@ -1,0 +1,118 @@
+.dashboard-center 
+{
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 1800px;
+  padding: 40px 50px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.1);
+  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  text-align: center;
+}
+
+.dashboard-center h1 
+{
+  margin-bottom: 32px;
+  font-weight: 700;
+  color: #222;
+  font-size: 2.5rem;
+  width: 100%;
+}
+
+.error-message,
+.success-message 
+{
+  width: 100%;
+  font-weight: 600;
+  margin-bottom: 24px;
+  padding: 16px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error-message 
+{
+  background-color: #f8d7da;
+  color: #842029;
+}
+
+.success-message 
+{
+  background-color: #d1e7dd;
+  color: #0f5132;
+}
+
+.user-table-wrapper 
+{
+  width: 100%;
+  overflow-x: auto;
+  margin-bottom: 32px;
+}
+
+table 
+{
+  width: 100%;
+  table-layout: auto;
+  border-collapse: collapse;
+  word-wrap: break-word;
+}
+
+th,
+td 
+{
+  padding: 16px;
+  text-align: left;
+  word-wrap: break-word;
+  white-space: normal;
+  max-width: 250px;
+  border-bottom: 1px solid #ddd;
+}
+
+@media (max-width: 1200px) 
+{
+  .dashboard-center 
+  {
+    max-width: 95%;
+    padding: 32px 40px;
+  }
+
+  .dashboard-center h1 
+  {
+    font-size: 2.2rem;
+  }
+
+  th,
+  td 
+  {
+    font-size: 14px;
+    padding: 12px;
+  }
+}
+
+@media (max-width: 768px) 
+{
+  .dashboard-center 
+  {
+    padding: 24px 30px;
+  }
+
+  .dashboard-center h1 
+  {
+    font-size: 1.8rem;
+  }
+
+  th,
+  td 
+  {
+    font-size: 12px;
+    padding: 8px;
+  }
+}

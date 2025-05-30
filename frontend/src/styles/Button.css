@@ -1,27 +1,47 @@
-.custom-btn {
-  padding: 0.5rem 1rem;
-  font-size: 1rem;
-  font-weight: 500;
-  background-color: #007bff;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
+.button-wrapper 
+{
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box;
+  display: flex;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.custom-btn 
+{
+  flex: 1 1 0;
+  padding: 6px 12px;
+  border: 1px solid #000;
+  border-radius: 3px;
+  background: transparent;
+  color: #000;
   cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.2s ease;
+  font-size: 14px;
+  transition: background-color 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  text-align: center;
+  white-space: nowrap;
 }
 
-.custom-btn:hover:not(:disabled) {
-  background-color: #0056b3;
-  transform: translateY(-1px);
+.custom-btn:hover:not(:disabled) 
+{
+  background-color: #eee;
 }
 
-.custom-btn:active:not(:disabled) {
-  transform: scale(0.98);
-}
-
-.custom-btn:disabled {
-  background-color: #ccc;
-  color: #666;
+.custom-btn:disabled 
+{
   cursor: not-allowed;
-  pointer-events: none;
+  opacity: 0.6;
+}
+
+.small-btn 
+{
+  padding: 3px 8px;
+  font-size: 12px;
+  min-width: 80px;
+  flex: 0 0 auto;
 }

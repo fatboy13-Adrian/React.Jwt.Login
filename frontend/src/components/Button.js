@@ -1,17 +1,28 @@
-import React from "react";                  //Import React for JSX support
-import "../styles/Button.css";              //Import external CSS for styling
+import React from "react";      //Importing React library for JSX syntax and the custom button styles
+import "../styles/Button.css";  //Importing the CSS file for button styling
 
-//Define reusable Button component with props
-export default function Button({             type = "button", onClick, disabled = false, children, className = "",}) 
+//Defining the Button component with props for customization
+export default function Button({type = "button", onClick, disabled = false, children, className = ""}) 
 {
   return (
-    <button
-      type={type}                           //Set button type attribute
-      onClick={onClick}                     //Attach onClick event handler
-      disabled={disabled}                   //Set disabled attribute if true
-      className={`custom-btn ${className}`} //Apply base and additional CSS classes
-    >
-      {children}                            //Render button content (text or elements)
-    </button>
+    //Wrapper div to center the button or apply additional styles if needed
+    <div className="button-wrapper">
+      <button
+        //Setting the button type (default is 'button' if not provided)
+        type={type}
+        
+        //Handling the click event passed from the parent component
+        onClick={onClick}
+        
+        //Disabling the button based on the 'disabled' prop (defaults to false)
+        disabled={disabled}
+        
+        //Applying a combination of default button styles with any custom class passed via props
+        className={`custom-btn small-btn ${className}`}
+      >
+        {/*Rendering the children prop as the button text or content*/}
+        {children}
+      </button>
+    </div>
   );
 }

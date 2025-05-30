@@ -1,37 +1,33 @@
-import React from "react";            //Import React                   
-import Button from "./Button";        //Import reusable Button component
-import "../styles/UserActions.css";   //Import CSS for UserActions styling
+import React from "react";        //Importing React library for JSX syntax and the custom button styles
+import "../styles/UserTable.css"; //Importing CSS for styling
 
-//Reusable UserActions component
-export default function UserActions({ user, currentUser, onUpdate, onDelete, disabled }) 
+//Define the 'UserActions' component as a default function export
+export default function UserActions({user, currentUser, onUpdate, onDelete, disabled}) 
 {
-  //Allow update if current user is admin or updating their own user info
-  const canUpdate = currentUser.role === "ADMIN" || user.userId === currentUser.userId;
-  
-  //Allow delete only if current user is admin and not deleting themselves
-  const canDelete = currentUser.role === "ADMIN" && user.userId !== currentUser.userId;
+  //Check if the logged-in user is the same as the current user to enable actions for their own profile
+  const isLoggedInUser = currentUser && user.userId === currentUser.userId;
+
+  //Check if the logged-in user is an admin
+  const isAdmin = currentUser && currentUser.role === "ADMIN";
 
   return (
-    <div className="user-actions">
-      {/*Update button enabled only if allowed and not globally disabled*/}
-      <Button onClick={() => onUpdate(user)} disabled={disabled || !canUpdate}>
-        Update
-      </Button>
+    <div className="action-buttons">
+      {/*Update button: Admins can update any profile, normal users can only update their own profile*/}
+      <button
+        onClick={() => onUpdate(user)}                        //Trigger the 'onUpdate' function when clicked, passing the 'user' object
+        disabled={disabled || (!isLoggedInUser && !isAdmin)}  //Enable for admin and the logged-in user only
+      >
+        Update  {/*Button text for updating the user*/}
+      </button>
 
-      {/*Conditionally render Delete button if deletion is allowed*/}
-      {canDelete && (
-        <Button
-          onClick={() => 
-          {
-            //Confirm deletion before proceeding
-            if(window.confirm(`Are you sure you want to delete user ${user.username}?`))
-              onDelete(user.userId);
-          }}
-          disabled={disabled}               //Disable button if globally disabled
-          className="delete-btn"            //Apply special delete button styles
+      {/*Delete button: Only admin can delete any user's profile except for their own*/}
+      {isAdmin && user.userId !== currentUser.userId && (
+        <button
+          onClick={() => onDelete(user.userId)} //Trigger the 'onDelete' function when clicked, passing the 'userId' of the user
+          disabled={disabled}                   //Disable if any other actions are disabled
         >
-          Delete
-        </Button>
+          Delete                                {/*Button text for deleting the user*/}
+        </button>
       )}
     </div>
   );

@@ -1,19 +1,26 @@
-import axios from 'axios';                      //Import the axios library to make HTTP requests
+import axios from "axios";                    //Import axios for making HTTP requests
 
-const API_URL = 'http://localhost:8080/auth';   //Define the base URL for the authentication API
+const API_URL = "http://localhost:8080/auth"; //Base URL for the authentication API
 
-//Function to log in a user with given username and password
+//Default export function for logging in a user
 export const loginUser = async (username, password) => 
 {
   try 
   {
-    const response = await axios.post(`${API_URL}/login`, {username, password});  //Send a POST request to the /login endpoint with the credentials    
-    return response.data;                                                           //Return the response data (e.g., token, user info)
+    //Making a POST request to the login endpoint with the username and password
+    const response = await axios.post(`${API_URL}/login`, { username, password });
+    
+    //Returning the response data if the request is successful
+    return response.data;
   } 
   
   catch(err) 
   {
-    console.error(err);                                                                     //Log the error to the console for debugging
-    throw new Error('Failed to login. Please check your credentials or try again later.');  //Throw a user-friendly error message
+    //Check if the error has a message from the response, and throw it as an error
+    if(err.response?.data?.message) 
+      throw new Error(err.response.data.message);                           //Return the message from the server if available
+    
+    //If no specific message, throw a generic error with the message from the caught error
+    throw new Error(err.message || "Failed to login. Please try again.");   //Provide a fallback error message
   }
 };

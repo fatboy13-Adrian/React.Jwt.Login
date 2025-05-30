@@ -1,92 +1,95 @@
-//Import necessary React hooks and Axios for HTTP requests
-import React, { createContext, useState, useEffect, useContext } from 'react';  
-import axios from 'axios';
+import React, {createContext, useState, useEffect, useContext} from 'react';    //Import React hooks and context API
+import axios from 'axios';                                                      //Import axios for making HTTP requests
 
-const AuthContext = createContext();    //Create a context to hold authentication-related values
+//Create an authentication context to share auth state across components
+const AuthContext = createContext();  
 
 //Helper function to check if a JWT token is expired
 const isTokenExpired = (token) => 
 {
-  try 
+  try
   {
-    const decoded = JSON.parse(atob(token.split('.')[1]));  //Decode JWT payload and check if current time is past the expiration
-    return decoded.exp * 1000 < Date.now();                 //Compare expiration in ms
+    //Decode the JWT token and extract the expiry time
+    const decoded = JSON.parse(atob(token.split('.')[1])); 
+    
+    //Compare the expiry time with the current time (converted to milliseconds)
+    return decoded.exp * 1000 < Date.now();
   } 
   
   catch(error) 
   {
-    return true;    //If decoding fails, treat token as expired
+    return true;  //If decoding fails (invalid token), treat it as expired
   }
 };
 
-//Set the Authorization header globally in Axios
+//Set the Authorization header for all Axios requests with the provided token
 const setAuthHeaders = (token) => 
 {
-  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  axios.defaults.headers.common['Authorization'] = `Bearer ${token}`; //Set the token in the Authorization header
 };
 
-//Remove the Authorization header from Axios
+//Remove the Authorization header from Axios (for logout or token expiry)
 const clearAuthHeaders = () => 
 {
-  delete axios.defaults.headers.common['Authorization'];
+  delete axios.defaults.headers.common['Authorization'];  //Remove the Authorization header
 };
 
-//Initialize auth state on first load using localStorage token
+//Check for a valid token on initial load and set authentication state accordingly
 const initializeAuthState = (setIsAuthenticated) => 
 {
-  const token = localStorage.getItem('token');  //Get token from localStorage
-    if(token && !isTokenExpired(token)) 
-    {
-        setAuthHeaders(token);                  //Set header for axios requests
-        setIsAuthenticated(true);               //Set auth state to true
-    }
+  const token = localStorage.getItem('token');  //Retrieve the token from localStorage
+  if(token && !isTokenExpired(token))           //If the token is valid (not expired)
+  {  
+    setAuthHeaders(token);                      //Set the token for future requests
+    setIsAuthenticated(true);                   //Mark user as authenticated
+  }
 };
 
-//Handle user login logic and update state
+//Handle user login: update state, localStorage, and Axios headers
 const login = (userData, setUser, setIsAuthenticated) => 
 {
-  setUser(userData);                                //Store user data in state
-  setIsAuthenticated(true);                         //Mark user as authenticated
-  localStorage.setItem('token', userData.token);    //Store token in localStorage
-  localStorage.setItem('role', userData.role);      //Optionally store user role
-  setAuthHeaders(userData.token);                   //Set axios header
+  setUser(userData);                              //Set the user data in the state
+  setIsAuthenticated(true);                       //Mark the user as authenticated
+  localStorage.setItem('token', userData.token);  //Save the token to localStorage
+  localStorage.setItem('role', userData.role);    //Save the user's role to localStorage
+  setAuthHeaders(userData.token);                 //Set the token for future HTTP requests
 };
 
-//Handle logout logic and clear everything
+//Handle user logout: clear state, localStorage, and Axios headers
 const logout = (setUser, setIsAuthenticated) => 
 {
-  setUser(null);                          //Clear user state
-  setIsAuthenticated(false);             //Mark as unauthenticated
-  localStorage.removeItem('token');      //Remove token from localStorage
-  localStorage.removeItem('role');       //Remove role if stored
-  clearAuthHeaders();                    //Clear axios headers
+  setUser(null);                    //Clear user data from the state
+  setIsAuthenticated(false);        //Mark the user as not authenticated
+  localStorage.removeItem('token'); //Remove the token from localStorage
+  localStorage.removeItem('role');  //Remove the user's role from localStorage
+  clearAuthHeaders();               //Remove the Authorization header
 };
 
-//Define and export the AuthProvider component
-export default function AuthProvider({ children }) 
+//Provider component to wrap around the app and manage authentication state
+export const AuthProvider = ({children}) => 
 {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);    //Track login status
-  const [user, setUser] = useState(null);                           //Store user data
+  const [isAuthenticated, setIsAuthenticated] = useState(false);  //Track the login state (authenticated or not)
+  const [user, setUser] = useState(null);                         //Track the current user data
 
-    //On mount, check for valid token and update auth state
-    useEffect(() => 
-    {
-        initializeAuthState(setIsAuthenticated);
-    }, []);
+  //On component mount, check for existing auth state (by looking for a valid token)
+  useEffect(() => 
+  {
+    initializeAuthState(setIsAuthenticated);  //Initialize auth state based on the token in localStorage
+  }, []);                                     //Empty dependency array ensures this runs only on mount
 
   return (
-    //Provide auth-related values and functions to children components
-    <AuthContext.Provider
+    <AuthContext.Provider 
       value={{
-        isAuthenticated,                                                    //Current auth status
-        user,                                                               //Current user object
-        login: (userData) => login(userData, setUser, setIsAuthenticated),  //Login handler
-        logout: () => logout(setUser, setIsAuthenticated),                  //Logout handler
+        isAuthenticated,                                                    //Provide the current authentication status
+        user,                                                               //Provide the current user data
+        login: (userData) => login(userData, setUser, setIsAuthenticated),  //Login function
+        logout: () => logout(setUser, setIsAuthenticated),                  //Logout function
       }}
     >
-      {children}    //Render wrapped children components
+      {children}  {/*Render the children components wrapped with the AuthContext provider*/}
     </AuthContext.Provider>
   );
-}
+};
 
-export const useAuth = () => useContext(AuthContext);   //Export a custom hook to use the AuthContext more easily
+//Custom hook to access the AuthContext from other components
+export const useAuth = () => useContext(AuthContext);  //Returns the current auth context (auth state, login, logout)
