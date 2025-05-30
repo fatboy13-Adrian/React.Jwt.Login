@@ -1,4 +1,5 @@
-.container.form-wrapper {
+.container.form-wrapper 
+{
   position: absolute;
   top: 50%;
   left: 50%;
@@ -14,7 +15,8 @@
   align-items: flex-start;
 }
 
-.dashboard-title {
+.dashboard-title 
+{
   margin-bottom: 32px;
   font-weight: 600;
   color: #333;
@@ -23,14 +25,15 @@
   width: 100%;
 }
 
-.register-form {
+.register-form 
+{
   width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Horizontally aligned label/input with vertical centering */
-.form-row {
+.form-row 
+{
   display: flex;
   flex-direction: row;
   align-items: center;
@@ -40,8 +43,8 @@
   min-height: 48px;
 }
 
-/* Vertically center label text */
-.form-label {
+.form-label 
+{
   flex: 0 0 150px;
   font-weight: 500;
   color: #555;
@@ -53,9 +56,9 @@
   line-height: 1.2;
 }
 
-/* Vertically center input fields */
 .form-input,
-.form-select {
+.form-select 
+{
   flex: 1;
   padding: 12px 16px;
   font-size: 15px;
@@ -70,13 +73,14 @@
 }
 
 .form-input:focus,
-.form-select:focus {
+.form-select:focus 
+{
   border-color: #4a90e2;
   outline: none;
 }
 
-/* Buttons */
-.form-actions {
+.form-actions 
+{
   margin-top: 32px;
   display: flex;
   justify-content: space-between;
@@ -84,7 +88,8 @@
   width: 100%;
 }
 
-.action-button {
+.action-button 
+{
   padding: 12px 24px;
   font-size: 16px;
   text-align: center;
@@ -94,9 +99,9 @@
   border-radius: 8px;
 }
 
-/* Messages */
 .error-message,
-.success-message {
+.success-message 
+{
   width: 100%;
   font-weight: 600;
   margin-bottom: 20px;
@@ -106,47 +111,55 @@
   border-radius: 8px;
 }
 
-.error-message {
+.error-message 
+{
   background-color: #f8d7da;
   color: #842029;
 }
 
-.success-message {
+.success-message 
+{
   background-color: #d1e7dd;
   color: #0f5132;
 }
 
-/* Mobile layout: Stack vertically */
-@media (max-width: 768px) {
-  .container.form-wrapper {
+@media (max-width: 768px) 
+{
+  .container.form-wrapper 
+  {
     width: 95%;
     padding: 24px;
   }
 
-  .dashboard-title {
+  .dashboard-title 
+  {
     font-size: 1.8rem;
   }
 
-  .form-row {
+  .form-row 
+  {
     flex-direction: column;
     align-items: flex-start;
     gap: 12px;
   }
 
-  .form-label {
+  .form-label 
+  {
     width: 100%;
     text-align: left;
     justify-content: flex-start;
   }
 
-  .form-actions {
+  .form-actions 
+  {
     flex-direction: column;
     align-items: center;
     gap: 10px;
   }
 
   .form-input,
-  .form-select {
+  .form-select 
+  {
     width: 100%;
     font-size: 14px;
   }

@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useCallback } from "react";  //Import React hooks
+import React, {useEffect, useState, useCallback} from "react";    //Import React hooks
 import axios from "axios";                                        //Import axios for HTTP requests
-import { useNavigate } from "react-router-dom";                   //Import navigation hook from react-router
+import {useNavigate} from "react-router-dom";                     //Import navigation hook from react-router
 import UserTable from "../components/UserTable";                  //Import UserTable component to display user list
 import "../styles/ViewUserDashboard.css";                         //Import CSS styles for dashboard
 

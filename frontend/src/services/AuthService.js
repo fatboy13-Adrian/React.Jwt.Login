@@ -8,7 +8,7 @@ export const loginUser = async (username, password) =>
   try 
   {
     //Making a POST request to the login endpoint with the username and password
-    const response = await axios.post(`${API_URL}/login`, { username, password });
+    const response = await axios.post(`${API_URL}/login`, {username, password});
     
     //Returning the response data if the request is successful
     return response.data;

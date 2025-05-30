@@ -1,5 +1,5 @@
 import React from "react";                                          //Importing React for JSX functionality
-import { Routes, Route, Navigate } from "react-router-dom";         //Importing necessary components from react-router-dom for routing
+import {Routes, Route, Navigate} from "react-router-dom";           //Importing necessary components from react-router-dom for routing
 import Login from "../pages/Login";                                 //Import Login page
 import ForgotLoginCredential from "../pages/ForgotLoginCredential"; //Import ForgotLoginCredential page
 import RegisterNewUser from "../pages/RegisterNewUser";             //Import RegisterNewUser page
