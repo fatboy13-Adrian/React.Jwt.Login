@@ -3,7 +3,6 @@
 UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSON Web Tokens)** for user authentication and authorization. It is designed as a plug-and-play module that can be integrated into any web-based application requiring user identity and access management.
 
 ## ✨ Features
-
 - 🔐 **Role-Based Access Control (RBAC):** Authenticate users based on predefined roles such as `USER` or `ADMIN`.
 - 🔑 **Token-Based Authentication:** Secure communication using JWT tokens stored in frontend `localStorage`.
 - 🛡️ **Strict Authorization:** Users can only view or modify their own data, while admins can manage all users.
@@ -11,7 +10,6 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 - 🌐 **RESTful APIs:** Easy integration for frontend/backend communication.
 
 ## ⚙️ Tech Stack
-
 ### Backend
 - Java Spring Boot
 - Spring Security
