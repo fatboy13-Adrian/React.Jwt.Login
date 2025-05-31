@@ -193,4 +193,24 @@ import UserTable from "../../components/UserTable";                 //Import the
         //Assert that Delete button is NOT rendered for admin deleting self
         expect(screen.queryByText("Delete")).not.toBeInTheDocument();
     });
+
+    //Test case to verify that action buttons are disabled when actionsDisabled is set to true
+    test("buttons are disabled when actionsDisabled is true", () => 
+    {
+        render(
+            <UserTable
+                users={[users[0]]}          //Use only the first user from the users array
+                currentUser={adminUser}     //Set current user as admin to enable delete button visibility
+                onUpdate={mockUpdate}       //Pass mocked update function
+                onDelete={mockDelete}       //Pass mocked delete function
+                actionsDisabled={true}      //Disable action buttons
+            />
+        );
+
+        //Check that the "Update" button is rendered and disabled
+        expect(screen.getByText("Update")).toBeDisabled();
+
+        //Check that the "Delete" button is rendered and disabled
+        expect(screen.getByText("Delete")).toBeDisabled();
+    });
 });

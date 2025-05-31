@@ -35,6 +35,8 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
     cd frontend<br>
     npm install axios<br>
     npm install react-router-dom<br>
+    npm install --save-dev @testing-library/react-hooks<br>
+    npm install --save-dev @testing-library/react @testing-library/jest-dom jest axios<br>
 
 ## Startup Procedures
 1. **Startup Backend**<br>

@@ -1,52 +1,57 @@
-import React from "react";                //Importing React for JSX functionality
-import UserActions from "./UserActions";  //Importing the 'UserActions' component for handling update/delete actions
-import "../styles/UserTable.css";         //Importing the CSS file for table styling
+import React from "react";              //Import React for JSX rendering
+import UserActions from "./UserActions" //Import component to handle update/delete buttons
+import "../styles/UserTable.css";       //Import custom CSS styles for the table
 
-//Helper function to clean and format text (e.g., handle null or empty values)
+//Utility function to clean text: returns '-' if text is null/empty
 function cleanText(text) 
 {
-  if(!text) return "-";                        //Return "-" if the text is null, undefined, or falsy
-  const trimmed = text.toString().trim();       //Trim any leading/trailing spaces
-  return trimmed.length === 0 ? "-" : trimmed;  //Return "-" if the text is empty, else return the trimmed text
+  if(!text) return "-";                         //Handle null, undefined, or falsy values
+  const trimmed = text.toString().trim();       //Trim leading/trailing whitespace
+  return trimmed.length === 0 ? "-" : trimmed;  //Replace empty string with '-'
 }
 
-//Default export of the UserTable component
+//Main UserTable component
 export default function UserTable({users, currentUser, onUpdate, onDelete, actionsDisabled}) 
 {
   return (
-    <div className="user-table-wrapper">                {/*Wrapper div for the table*/}
-      <table className="user-table">                    {/*Table for displaying user data*/}
-        <thead>                                         {/*Table header*/}
-          <tr>                                          {/*Row containing table headers*/}
-            <th>ID</th>                                 {/*Table column for ID*/}
-            <th>First Name</th>                         {/*Table column for First Name*/}
-            <th>Last Name</th>                          {/*Table column for Last Name*/}
-            <th>Username</th>                           {/*Table column for Username*/}
-            <th>Email</th>                              {/*Table column for Email*/}
-            <th>Phone</th>                              {/*Table column for Phone*/}
-            <th className="address-col">Address</th>    {/*Table column for Address, with specific class for styling*/}
-            <th>Role</th>                               {/*Table column for Role*/}
-            <th className="center-content">Actions</th> {/*Table column for Actions, centered content*/}
+    <div className="user-table-wrapper"> {/*Wrapper div for layout control*/}
+      <table className="user-table">     {/*Main table structure*/}
+        <thead>                          {/*Table header row*/}
+          <tr>
+            <th>ID</th>
+            <th>First Name</th>
+            <th>Last Name</th>
+            <th>Username</th>
+            <th>Email</th>
+            <th>Phone</th>
+            <th className="address-col">Address</th>
+            <th>Role</th>
+            <th className="center-content">Actions</th>
           </tr>
         </thead>
-        <tbody>                                                           {/*Table body to display rows*/}
-          {users.map((user) => (                                          //Mapping through each user object in 'users' array
-            <tr key={user.userId}>                                        {/*Each row is uniquely identified by the user's userId*/}
-              <td>{user.userId}</td>                                      {/*Display the user's ID*/}
-              <td>{cleanText(user.firstName)}</td>                        {/*Display the first name, cleaned*/}
-              <td>{cleanText(user.lastName)}</td>                         {/*Display the last name, cleaned*/}
-              <td>{cleanText(user.username)}</td>                         {/*Display the username, cleaned*/}
-              <td>{cleanText(user.email)}</td>                            {/*Display the email, cleaned*/}
-              <td>{cleanText(user.phone)}</td>                            {/*Display the phone number, cleaned*/}
-              <td className="address-col">{cleanText(user.address)}</td>  {/*Display the address, cleaned, with specific styling*/}
-              <td>{cleanText(user.role)}</td>                             {/*Display the role, cleaned*/}
-              <td className="center-content">                             {/*Column for the action buttons*/}
-                <UserActions                                              //Render the UserActions component for each user
-                  user={user}                                             //Pass the user data to UserActions
-                  currentUser={currentUser}                               //Pass the current logged-in user for restricting actions
-                  onUpdate={onUpdate}                                     //Pass the update action function
-                  onDelete={onDelete}                                     //Pass the delete action function
-                  disabled={actionsDisabled}                              //Pass the disabled prop to conditionally disable actions
+
+        {/*Table body for user data rows*/}
+        <tbody>
+          {/*Map through users and generate a row for each*/}
+          {users.map((user) => (
+            <tr key={user.userId}>
+              <td>{user.userId}</td>
+              <td>{cleanText(user.firstName)}</td>
+              <td>{cleanText(user.lastName)}</td>
+              <td>{cleanText(user.username)}</td>
+              <td>{cleanText(user.email)}</td>
+              <td>{cleanText(user.phone)}</td>
+              <td className="address-col">{cleanText(user.address)}</td>
+              <td>{cleanText(user.role)}</td>
+
+              {/*Render action buttons for each row*/}
+              <td className="center-content">
+                <UserActions
+                  user={user}                 //Current row's user object
+                  currentUser={currentUser}   //Context: logged-in user
+                  onUpdate={onUpdate}         //Callback for Update button
+                  onDelete={onDelete}         //Callback for Delete button
+                  disabled={actionsDisabled}  //Disable if true
                 />
               </td>
             </tr>

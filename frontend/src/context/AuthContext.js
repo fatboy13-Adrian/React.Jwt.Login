@@ -93,3 +93,6 @@ export const AuthProvider = ({children}) =>
 
 //Custom hook to access the AuthContext from other components
 export const useAuth = () => useContext(AuthContext);  //Returns the current auth context (auth state, login, logout)
+
+//Named exports for helper functions (for testing or external usage)
+export {isTokenExpired, setAuthHeaders, clearAuthHeaders, initializeAuthState, login, logout,};
