@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom';                             //Import jest-dom for extended DOM matchers
 import React from "react";                                      //Import React (required for JSX)
-import { render, screen, act } from "@testing-library/react";   //Import testing utilities from React Testing Library
+import {render, screen, act} from "@testing-library/react";     //Import testing utilities from React Testing Library
 import axios from "axios";                                      //Import axios for mocking HTTP requests
 
 //Import all from AuthContext module
@@ -247,7 +247,7 @@ describe("Auth Context Utilities", () =>
     {
         //Create a valid token with a far future expiry
         const futureExp = Math.floor(new Date("3000-01-01").getTime() / 1000);
-        const validPayload = btoa(JSON.stringify({ exp: futureExp }));
+        const validPayload = btoa(JSON.stringify({exp: futureExp}));
         const token = `header.${validPayload}.signature`;
         localStorage.setItem("token", token);   //Set token in localStorage
         localStorage.setItem("role", "admin");  //Set role in localStorage
