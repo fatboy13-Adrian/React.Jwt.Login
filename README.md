@@ -16,6 +16,7 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 - JSON Web Token (JWT)
 - Hibernate / Java Persistence API (JPA)
 - H2 Database (for testing/development)
+- PostgreSQL Database (for production)
 
 ### Frontend
 - React
@@ -92,3 +93,23 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
     -   GET /users/ViewUserProfiles: view all user profiles
     -   PATCH /users/UpdateUserProfile/{userId}: update your own user profile
     -   DELETE /users/DeleteUserProfile/{userId}: Admin to delete user profile
+
+## Error Handling
+### Common Error Codes
+
+| Status Code | Description           | Common Causes                                      |
+|-------------|-----------------------|---------------------------------------------------|
+| 400         | Bad Request           | Invalid input, missing required fields             |
+| 401         | Unauthorized          | Invalid or expired JWT token                       |
+| 403         | Forbidden             | Insufficient permissions for the requested action  |
+| 404         | Not Found             | Resource (user, achievement, etc.) does not exist  |
+| 409         | Conflict              | Username or email already exists                   |
+| 500         | Internal Server Error | Server-side error                                  |
+
+### Running Tests
+
+### Run all tests for backend
+mvn test
+
+### Run all tests for frontend
+npm test
