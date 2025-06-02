@@ -11,19 +11,19 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 
 ## ⚙️ Tech Stack
 ### Backend
-- Java Spring Boot
-- Spring Security
-- JSON Web Token (JWT)
-- Hibernate / Java Persistence API (JPA)
-- H2 Database (for testing/development)
-- PostgreSQL Database (for production)
+    -   Java Spring Boot
+    -   Spring Security
+    -   JSON Web Token (JWT)
+    -   Hibernate / Java Persistence API (JPA)
+    -   H2 Database (for testing/development)
+    -   PostgreSQL Database (for production)
 
 ### Frontend
-- React
-- JavaScript
-- HTML & CSS
-- Axios
-- React Router DOM
+    -   React
+    -   JavaScript
+    -   HTML & CSS
+    -   Axios
+    -   React Router DOM
 
 ## Installation Procedures
 1. **Clone Repository**<br>
@@ -113,3 +113,13 @@ mvn test
 
 ### Run all tests for frontend
 npm test
+
+## Dockerfile
+### Backend
+### Package the application
+1. Open a terminal where your pom.xml file is.
+2. Run: mvn clean package
+3. The JAR file will be in the target/ folder (React.Jwt.Login-0.0.1-SNAPSHOT.jar).
+4. In your dockerfile, use either one of these codes:
+    -   if you intend to hardcode the filename: COPY --from=build /app/target/React.Jwt.Login-0.0.1-SNAPSHOT.jar app.jar
+    -   if you do not intend to hardcode the filename: COPY --from=build /app/target/*.jar app.jar
