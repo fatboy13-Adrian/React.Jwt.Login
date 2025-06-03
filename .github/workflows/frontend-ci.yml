@@ -29,7 +29,6 @@ jobs:
       - name: Cache node modules and npm cache
         uses: actions/cache@v4
         with:
-          # Cache both node_modules and npm cache for better performance
           path: |
             ~/.npm
             node_modules
@@ -37,8 +36,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-node
 
-      - name: Install dependencies with legacy peer deps
-        run: npm ci --legacy-peer-deps
+      - name: Configure npm to use legacy-peer-deps
+        run: npm config set legacy-peer-deps true
+
+      - name: Install dependencies with npm ci
+        run: npm ci
 
       - name: Run tests
         run: npm test -- --watchAll=false
