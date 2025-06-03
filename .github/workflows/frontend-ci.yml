@@ -1,46 +1,45 @@
-name: React Frontend CI
+name: Java Backend CI
 
 on:
   push:
     paths:
-      - 'frontend/**'
-      - 'package.json'
-      - 'package-lock.json'
+      - 'backend/**'
+      - 'backend/pom.xml'
     branches: [ "main" ]
   pull_request:
     paths:
-      - 'frontend/**'
-      - 'package.json'
-      - 'package-lock.json'
+      - 'backend/**'
+      - 'backend/pom.xml'
     branches: [ "main" ]
 
 jobs:
-  build-and-test:
+  build:
     runs-on: ubuntu-latest
 
     defaults:
       run:
-        working-directory: frontend
+        working-directory: backend
 
     steps:
-      - name: Checkout repository
+      - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
         with:
-          node-version: '18'
+          distribution: temurin
+          java-version: 17
 
-      - name: Cache node modules
+      - name: Cache Maven dependencies
         uses: actions/cache@v4
         with:
-          path: frontend/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('backend/pom.xml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-maven
 
-      - name: Install dependencies
-        run: npm install
+      - name: Build project with Maven
+        run: mvn clean install
 
       - name: Run unit tests
-        run: npm test -- --watchAll=false --ci
+        run: mvn test
