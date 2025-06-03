@@ -114,12 +114,30 @@ mvn test
 ### Run all tests for frontend
 npm test
 
-## Dockerfile
-### Backend
-### Package the application
+## Dockerfile package the application
+### Backend (Java Spring Boot)
 1. Open a terminal where your pom.xml file is.
 2. Run: mvn clean package
 3. The JAR file will be in the target/ folder (React.Jwt.Login-0.0.1-SNAPSHOT.jar).
 4. In your dockerfile, use either one of these codes:
     -   if you intend to hardcode the filename: COPY --from=build /app/target/React.Jwt.Login-0.0.1-SNAPSHOT.jar app.jar
     -   if you do not intend to hardcode the filename: COPY --from=build /app/target/*.jar app.jar
+5. Add .dockerignore file to prevent docker from commiting unwant files.
+6. Run this command to build docker image: docker build -t react-jwt-login-backend .
+
+
+### Frontend (React)
+1. Open a new terminal and CD into frontend: cd frontend
+2. Run: npm run build
+3. Create dockerfile for react frontend
+4. Add .dockerignore file to speed up docker build
+5. Build docker frontend image: docker build -t react.jwt.login.frontend .
+
+### Running the docker container images
+1. Run the Java Spring Boot Backend: docker run -p 8080:8080 react-jwt-login-backend
+2. Make sure you see this log message: Tomcat started on port(s): 8080 ...
+3. Use postman client or swagger UI to test the endpoints by going to: http://localhost:8080/auth/login.
+4. Wait for about 3 to 5 seconds after you start the backend service.
+5. Run the React Frontend: docker run -d -p 3000:3000 react.jwt.login.frontend
+6. Your react frontend app should be live at: http://localhost:3000 
+7. Go to your internet browser and type: http://localhost:3000 the app did not appear automatically after you performed step 6.

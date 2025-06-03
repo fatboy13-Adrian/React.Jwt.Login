@@ -1,0 +1,30 @@
+# Base image with Node.js
+FROM node:18-alpine
+
+# Set working directory
+WORKDIR /app
+
+# Copy package.json and package-lock.json (if present)
+COPY package*.json ./
+
+# Install dependencies
+RUN npm install
+
+# Copy source code
+COPY . .
+
+# Run tests (Jest)
+RUN npm test -- --ci --coverage --watchAll=false
+
+# Build the app
+RUN npm run build
+
+# Install lightweight static server
+RUN npm install -g serve
+
+# Expose the port React uses
+EXPOSE 3000
+
+# Start the static server to serve the build folder
+RUN npm install -g serve
+CMD ["serve", "-s", "build"]
