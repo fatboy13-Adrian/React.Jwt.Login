@@ -3,13 +3,13 @@ name: Java Backend CI
 on:
   push:
     paths:
-      - 'backend/**'
-      - 'backend/pom.xml'
+      - 'src/**'
+      - 'src/pom.xml'
     branches: [ "main" ]
   pull_request:
     paths:
-      - 'backend/**'
-      - 'backend/pom.xml'
+      - 'src/**'
+      - 'src/pom.xml'
     branches: [ "main" ]
 
 jobs:
@@ -18,7 +18,7 @@ jobs:
 
     defaults:
       run:
-        working-directory: backend
+        working-directory: src
 
     steps:
       - name: Checkout code
@@ -34,7 +34,7 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('backend/pom.xml') }}
+          key: ${{ runner.os }}-maven-${{ hashFiles('src/pom.xml') }}
           restore-keys: |
             ${{ runner.os }}-maven
 
