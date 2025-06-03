@@ -123,8 +123,8 @@ npm test
     -   if you intend to hardcode the filename: COPY --from=build /app/target/React.Jwt.Login-0.0.1-SNAPSHOT.jar app.jar
     -   if you do not intend to hardcode the filename: COPY --from=build /app/target/*.jar app.jar
 5. Add .dockerignore file to prevent docker from commiting unwant files.
-6. Run this command to build docker image: docker build -t react-jwt-login-backend .
-
+6. Run this command to build docker image: docker build -t fatb0y13/react.jwt.login:latest .
+7. Run this command to push dokcer image to docker hub: docker push fatb0y13/react.jwt.login:latest
 
 ### Frontend (React)
 1. Open a new terminal and CD into frontend: cd frontend
@@ -132,6 +132,8 @@ npm test
 3. Create dockerfile for react frontend
 4. Add .dockerignore file to speed up docker build
 5. Build docker frontend image: docker build -t react.jwt.login.frontend .
+6. Push docker image to docker hub: docker build -t fatb0y13/react.jwt.login.frontend .
+7. Run this command to push docker image to docker-hub: docker push: docker push fatb0y13/react.jwt.login.frontend:latest
 
 ### Running the docker container images
 1. Run the Java Spring Boot Backend: docker run -p 8080:8080 react-jwt-login-backend

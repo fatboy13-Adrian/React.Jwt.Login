@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package.json and package-lock.json (if present)
 COPY package*.json ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies with legacy peer deps flag to avoid conflicts
+RUN npm install --legacy-peer-deps
 
 # Copy source code
 COPY . .
@@ -19,12 +19,11 @@ RUN npm test -- --ci --coverage --watchAll=false
 # Build the app
 RUN npm run build
 
-# Install lightweight static server
+# Install lightweight static server globally once
 RUN npm install -g serve
 
 # Expose the port React uses
 EXPOSE 3000
 
 # Start the static server to serve the build folder
-RUN npm install -g serve
 CMD ["serve", "-s", "build"]
