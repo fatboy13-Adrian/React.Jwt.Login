@@ -2,12 +2,12 @@ name: React Frontend CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches: ["**"]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
   pull_request:
-    branches: [ "**" ]
+    branches: ["**"]
     paths:
       - 'frontend/**'
       - '.github/workflows/frontend-ci.yml'
@@ -77,11 +77,11 @@ jobs:
       - name: Build Docker image
         run: docker build -t fatb0y13/react-jwt-login-frontend:latest ./frontend
 
-      - name: Save Docker image to artifact
+      - name: Save Docker image as artifact
         run: docker save fatb0y13/react-jwt-login-frontend:latest -o image.tar
 
       - name: Upload Docker image artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v3.1.2
         with:
           name: docker-image
           path: image.tar
@@ -92,12 +92,12 @@ jobs:
     needs: docker-build
     steps:
       - name: Download Docker image artifact
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v3.1.2
         with:
           name: docker-image
           path: .
 
-      - name: Load Docker image from artifact
+      - name: Load Docker image
         run: docker load -i image.tar
 
       - name: Log in to Docker Hub
