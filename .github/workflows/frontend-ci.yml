@@ -1,0 +1,46 @@
+name: React Frontend CI
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - 'package.json'
+      - 'package-lock.json'
+    branches: [ "main" ]
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'package.json'
+      - 'package-lock.json'
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+
+      - name: Cache node modules
+        uses: actions/cache@v4
+        with:
+          path: frontend/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('frontend/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run unit tests
+        run: npm test -- --watchAll=false --ci
