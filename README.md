@@ -141,3 +141,13 @@ npm test
 5. Run the React Frontend: docker run -d -p 3000:3000 react.jwt.login.frontend
 6. Your react frontend app should be live at: http://localhost:3000 
 7. Go to your internet browser and type: http://localhost:3000 the app did not appear automatically after you performed step 6.
+
+## CI with Github Actions
+### Backend
+1. Generate backend-ci.yml with all the required workflows, jobs and steps.
+2. Open terminal in vscode, type the below commands:
+    echo "// force trigger" >> src/dummy.txt
+    git add src/dummy.txt
+    git commit -m "Trigger CI workflow"
+    git push origin main
+3. It will generate a dummy text file, add it into the src folder and trigger the CI workflow for backend.

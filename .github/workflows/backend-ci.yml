@@ -13,13 +13,28 @@ on:
     branches: [ "main" ]
 
 jobs:
-  build:
+  checkout:
+    name: Checkout Code
     runs-on: ubuntu-latest
+    outputs:
+      commit: ${{ steps.commit_hash.outputs.commit }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
+      - name: Get commit hash
+        id: commit_hash
+        run: echo "commit=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
+
+  build:
+    name: Build with Maven
+    needs: checkout
+    runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: ./  # root folder where pom.xml is
-
+        working-directory: ./
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -39,7 +54,32 @@ jobs:
             ${{ runner.os }}-maven
 
       - name: Build project with Maven
-        run: mvn clean install
+        run: mvn clean install -DskipTests=true
+
+  test:
+    name: Run Unit Tests
+    needs: build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven
 
       - name: Run unit tests
         run: mvn test
