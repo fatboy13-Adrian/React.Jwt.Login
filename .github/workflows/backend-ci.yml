@@ -19,10 +19,13 @@ jobs:
     outputs:
       commit: ${{ steps.commit_hash.outputs.commit }}
     steps:
-      - name: Checkout code
+      - name: Checkout repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+
+      - name: Print confirmation
+        run: echo "✅ Code checked out"
 
       - name: Get commit hash
         id: commit_hash
@@ -53,8 +56,10 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven
 
-      - name: Build project with Maven
-        run: mvn clean install -DskipTests=true
+      - name: Build project
+        run: |
+          echo "🏗️ Building project..."
+          mvn clean install -DskipTests=true
 
   test:
     name: Run Unit Tests
@@ -82,4 +87,6 @@ jobs:
             ${{ runner.os }}-maven
 
       - name: Run unit tests
-        run: mvn test
+        run: |
+          echo "🧪 Running tests..."
+          mvn test
