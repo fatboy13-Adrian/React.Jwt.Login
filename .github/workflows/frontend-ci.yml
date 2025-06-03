@@ -1,0 +1,61 @@
+name: React Frontend CI
+
+on:
+  push:
+    paths:
+      - 'frontend/**'
+      - 'frontend/Dockerfile'
+    branches: [ "main" ]
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'frontend/Dockerfile'
+    branches: [ "main" ]
+
+jobs:
+  build-and-test:
+    name: Build and Test React Frontend
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install --legacy-peer-deps
+
+      - name: Run unit tests
+        run: npm test -- --ci --coverage --watchAll=false
+
+      - name: Build React app
+        run: npm run build
+
+  docker-build-and-push:
+    name: Docker Build and Push
+    needs: build-and-test
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker image
+        run: docker build -t fatb0y13/react-jwt-login-frontend:latest .
+
+      - name: Push Docker image
+        run: docker push fatb0y13/react-jwt-login-frontend:latest
