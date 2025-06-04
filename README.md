@@ -98,7 +98,7 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 ### Common Error Codes
 
 | Status Code | Description           | Common Causes                                      |
-|-------------|-----------------------|---------------------------------------------------|
+|-------------|-----------------------|----------------------------------------------------|
 | 400         | Bad Request           | Invalid input, missing required fields             |
 | 401         | Unauthorized          | Invalid or expired JWT token                       |
 | 403         | Forbidden             | Insufficient permissions for the requested action  |
@@ -114,42 +114,167 @@ mvn test
 ### Run all tests for frontend
 npm test
 
-## Dockerfile package the application
-### Backend (Java Spring Boot)
-1. Open a terminal where your pom.xml file is.
-2. Run: mvn clean package
-3. The JAR file will be in the target/ folder (React.Jwt.Login-0.0.1-SNAPSHOT.jar).
-4. In your dockerfile, use either one of these codes:
-    -   if you intend to hardcode the filename: COPY --from=build /app/target/React.Jwt.Login-0.0.1-SNAPSHOT.jar app.jar
-    -   if you do not intend to hardcode the filename: COPY --from=build /app/target/*.jar app.jar
-5. Add .dockerignore file to prevent docker from commiting unwant files.
-6. Run this command to build docker image: docker build -t fatb0y13/react.jwt.login:latest .
-7. Run this command to push dokcer image to docker hub: docker push fatb0y13/react.jwt.login:latest
+## Docker and CI/CD for Spring Boot & React with GitHub Actions
+### Backend (Spring Boot) Dockerization
+1. Open a terminal and navigate to your Spring Boot project directory (where pom.xml is located).
+2. Run the following Maven command to clean and package the application: mvn clean package
+3. After the command finishes, your .jar file will be created in the target/ directory (e.g., React.Jwt.Login-0.0.1-SNAPSHOT.jar).
+4. In the root directory of your project (same directory as pom.xml), create a Dockerfile.
+5. Add the following contents to your Dockerfile:
+    # Use a base image with JDK for Spring Boot
+    FROM openjdk:17-jdk-slim AS build
 
-### Frontend (React)
-1. Open a new terminal and CD into frontend: cd frontend
-2. Run: npm run build
-3. Create dockerfile for react frontend
-4. Add .dockerignore file to speed up docker build
-5. Build docker frontend image: docker build -t react.jwt.login.frontend .
-6. Push docker image to docker hub: docker build -t fatb0y13/react.jwt.login.frontend .
-7. Run this command to push docker image to docker-hub: docker push: docker push fatb0y13/react.jwt.login.frontend:latest
+    # Set the working directory
+    WORKDIR /app
 
-### Running the docker container images
-1. Run the Java Spring Boot Backend: docker run -p 8080:8080 react-jwt-login-backend
-2. Make sure you see this log message: Tomcat started on port(s): 8080 ...
-3. Use postman client or swagger UI to test the endpoints by going to: http://localhost:8080/auth/login.
-4. Wait for about 3 to 5 seconds after you start the backend service.
-5. Run the React Frontend: docker run -d -p 3000:3000 react.jwt.login.frontend
-6. Your react frontend app should be live at: http://localhost:3000 
-7. Go to your internet browser and type: http://localhost:3000 the app did not appear automatically after you performed step 6.
+    # Copy the JAR file from the target directory
+    COPY target/*.jar app.jar
 
-## CI with Github Actions
-### Backend
-1. Generate backend-ci.yml with all the required workflows, jobs and steps.
-2. Open terminal in vscode, type the below commands:
+    # Expose the port on which your app will run
+    EXPOSE 8080
+
+    # Run the JAR file
+    ENTRYPOINT ["java", "-jar", "app.jar"]
+
+6. Create a .dockerignore file in the same directory as the Dockerfile.
+7. Add the following to .dockerignore to avoid copying unnecessary files into the Docker image:
+    target/
+    .git/
+    .idea/
+    *.iml
+
+8. In the terminal, run the following command to build your Docker image: docker build -t fatb0y13/react.jwt.login.backend:latest .
+9. Log in to Docker Hub using your credentials: docker login
+10. Push your Docker image to Docker Hub: docker push fatb0y13/react.jwt.login.backend:latest
+
+### Frontend (React) Dockerization
+1. Open a terminal and navigate to the frontend directory.
+2. Run the following command to create the production build of your React app: npm run build
+3. In the frontend directory, create a Dockerfile.
+4. Add the following contents to your Dockerfile:
+    # Stage 1: Build the React app
+    FROM node:16 AS build
+
+    WORKDIR /app
+    COPY . .
+    RUN npm install
+    RUN npm run build
+
+    # Stage 2: Serve the React app using Nginx
+    FROM nginx:alpine
+    COPY --from=build /app/build /usr/share/nginx/html
+
+5. In the frontend directory, create a .dockerignore file.
+6. Add the following to .dockerignore to avoid copying unnecessary files into the Docker image:
+    node_modules/
+    build/
+    .git/
+
+7. In the terminal, run the following command to build your Docker image: docker build -t fatb0y13/react.jwt.login.frontend:latest .
+8. Push your Docker image to Docker Hub: docker push fatb0y13/react.jwt.login.frontend:latest
+
+### Running the Docker Containers Locally
+1. To run the backend Docker container, execute the following command: docker run -p 8080:8080 react.jwt.login.backend
+2. Check the logs to ensure that the backend service has started successfully: Tomcat started on port(s): 8080 ...
+3. To run the frontend Docker container, execute the following command: docker run -d -p 3000:3000 react.jwt.login.frontend
+4. Open your browser and go to http://localhost:3000 to view the frontend.
+5. Use Postman or Swagger UI to test your API endpoints.
+6. Go to: http://localhost:8080/auth/login.
+
+## Setting up GitHub Actions CI/CD Workflows
+### Upate Secrets and Variables in GitHub
+1. Go to your GitHub repository.
+2. Click on Settings -> Secrets and Variables -> Actions.
+3. Add the following secrets to securely store sensitive data: DOCKER_USERNAME, DOCKER_PASSWORD
+
+### Backend CI/CD Workflow
+1. Create a .github/workflows/backend-ci.yml file in your repository.
+2. Add the following contents to backend-ci.yml to automate the Docker build and push process:
+    name: Backend CI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .
+          push: true
+          tags: fatb0y13/react.jwt.login.backend:latest
+
+3. To trigger the workflow, Add a dummy file to your project to trigger the CI:
     echo "// force trigger" >> src/dummy.txt
     git add src/dummy.txt
     git commit -m "Trigger CI workflow"
     git push origin main
-3. It will generate a dummy text file, add it into the src folder and trigger the CI workflow for backend.
+
+4. After the workflow completes, remove the dummy file and push again:
+    git rm src/dummy.txt
+    git commit -m "Remove dummy file"
+    git push origin main
+
+### Frontend CI/CD Workflow
+1. Create a .github/workflows/frontend-ci.yml file in your repository.
+2. Add the following contents to frontend-ci.yml to automate the Docker build and push process for the frontend:
+    name: Frontend CI
+
+    on:
+    push:
+        branches:
+        - main
+    pull_request:
+        branches:
+        - main
+
+    jobs:
+    build:
+        runs-on: ubuntu-latest
+
+        steps:
+        - name: Checkout code
+            uses: actions/checkout@v2
+
+        - name: Set up Docker Buildx
+            uses: docker/setup-buildx-action@v2
+
+        - name: Log in to Docker Hub
+            uses: docker/login-action@v2
+            with:
+            username: ${{ secrets.DOCKER_USERNAME }}
+            password: ${{ secrets.DOCKER_PASSWORD }}
+
+        - name: Build and push Docker image
+            uses: docker/build-push-action@v2
+            with:
+            context: frontend
+            push: true
+            tags: fatb0y13/react.jwt.login.frontend:latest
+
+3. Push your latest changes to GitHub: git push origin main
+
+### Monitoring the CI/CD Workflow in GitHub Actions
+1. Go to the Actions tab in your GitHub repository.
+2. You will see the workflow runs under the Workflow Runs section.
+3. Click on the workflow name (e.g., Backend CI or Frontend CI) to monitor the status, view logs, and troubleshoot if necessary.
