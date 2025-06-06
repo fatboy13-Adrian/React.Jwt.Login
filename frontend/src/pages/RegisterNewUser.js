@@ -59,7 +59,7 @@ export default function RegisterNewUser()
     try 
     {
       //Send POST request to backend to register the new user
-      await axios.post("http://localhost:8080/users", trimmedUser);
+      await axios.post("http://localhost:8080/users/register", trimmedUser);
       setSuccess(true);  //Set success state if registration is successful
       setTimeout(() => navigate("/"), 5000);  //Redirect to home page after 5 seconds
     } 

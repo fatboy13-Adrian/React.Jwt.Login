@@ -1,184 +1,146 @@
-package com.React.Jwt.Login.Controller;                 //Declares the package for controller classes
-import com.React.Jwt.Login.DTO.UserDTO;                 //Imports the User Data Transfer Object
-import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;    //Imports the Authentication Response DTO
-import com.React.Jwt.Login.Enum.Role;                   //Imports the Role enum (e.g., CUSTOMER, ADMIN)
-import com.React.Jwt.Login.Exception.*;                 //Imports custom exception classes
-import com.React.Jwt.Login.Service.UserService;         //Imports the UserService interface
-import org.junit.jupiter.api.BeforeEach;                //JUnit 5 annotation for lifecycle methods like @BeforeEach
-import org.junit.jupiter.api.Test;                      //JUnit 5 annotation for marking test methods
-import org.junit.jupiter.api.extension.ExtendWith;      //JUnit 5 extension support for integrating Mockito
-import org.mockito.InjectMocks;                         //Mockito annotation to inject mocks
-import org.mockito.Mock;                                //Mockito annotation to create mock objects
-import org.mockito.junit.jupiter.MockitoExtension;      //Enables Mockito support for JUnit 5
-import org.springframework.http.HttpStatus;             //Imports HTTP status codes
-import org.springframework.http.ResponseEntity;         //Represents the full HTTP response including body, status, and headers
-import java.util.Collections;                           //Imports utility class for creating immutable singleton lists
-import java.util.List;                                  //Imports List interface for user list operations
-import static org.junit.jupiter.api.Assertions.*;       //Static import for assertion methods
-import static org.mockito.ArgumentMatchers.*;           //Static import for argument matchers
-import static org.mockito.Mockito.*;                    //Static import for Mockito behavior verification
+package com.React.Jwt.Login.Controller;                 //Declare the package for the controller tests
+import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;    //Import DTO for authentication response
+import com.React.Jwt.Login.DTO.UserDTO;                 //Import DTO for user information
+import com.React.Jwt.Login.Service.UserService;         //Import the user service to be mocked
+import org.junit.jupiter.api.BeforeEach;                //Runs before each test method
+import org.junit.jupiter.api.Test;                      //Marks a method as a test case
+import org.junit.jupiter.api.extension.ExtendWith;      //Integrates extensions (Mockito here)
+import org.mockito.InjectMocks;                         //Injects mocks into the object being tested
+import org.mockito.Mock;                                //Marks a field to be mocked
+import org.mockito.junit.jupiter.MockitoExtension;      //Enables Mockito with JUnit 5
+import org.springframework.http.ResponseEntity;         //Spring framework class for HTTP responses
+import java.util.List;                                  //Java utility class for lists
+import static org.junit.jupiter.api.Assertions.*;       //Provides assertion methods
+import static org.mockito.Mockito.*;                    //Provides mocking utilities
 
-@ExtendWith(MockitoExtension.class) //Enables Mockito support for this test class
-public class UserControllerTest 
+@ExtendWith(MockitoExtension.class) //Extend the test class with Mockito support
+class UserControllerTest 
 {
-    @Mock
-    private UserService userService;        //Mocks the UserService dependency
+    @Mock 
+    private UserService userService;        //Mock the UserService dependency
 
-    @InjectMocks
-    private UserController userController;  //Injects the mocked dependencies into UserController
+    @InjectMocks 
+    private UserController userController;  //Inject the mocked UserService into the controller
 
-    private UserDTO userDTO;                //Test user data used across multiple test methods
+    //Test data objects
+    private UserDTO userDTO;
+    private AuthResponseDTO authResponseDTO;
 
-    //Initializes test data before each test
-    @BeforeEach
-    public void setUp() 
+    @BeforeEach //Runs before each test to set up data
+    void setUp() 
     {
-        userDTO = UserDTO.builder().userId(1L).firstName("test").lastName("test1").address("123 Street").phone("+6512345678")
-        .username("testUser").email("test@example.com").password("password123").role(Role.CUSTOMER).build(); 
+        userDTO = new UserDTO();                                //Create a new UserDTO
+        userDTO.setUserId(1L);                          //Set user ID
+        userDTO.setUsername("testUser");                //Set username
+        authResponseDTO = new AuthResponseDTO();                //Create a new AuthResponseDTO
+        authResponseDTO.setMessage("Profile updated");  //Set message
     }
 
-    //Test for successful user registration
-    @Test
-    public void testRegisterNewUser_Success() 
+    @Test   //Test registration success scenario
+    void RegisterNewUser_ShouldRegisterAndReturnUserDTO() 
     {
-        when(userService.RegisterNewUser(any(UserDTO.class))).thenReturn(userDTO);                  //Mocks service response
-        ResponseEntity<UserDTO> response = userController.RegisterNewUser(userDTO);                     //Calls controller method
-        assertEquals(HttpStatus.OK, response.getStatusCode());                                          //Asserts 200 OK
-        assertEquals(userDTO, response.getBody());                                                      //Asserts response body
-        verify(userService, times(1)).RegisterNewUser(any(UserDTO.class));  //Verifies service method call
+        when(userService.registerNewUser(userDTO)).thenReturn(userDTO);             //Mock behavior
+        ResponseEntity<UserDTO> response = userController.RegisterNewUser(userDTO); //Call controller
+        assertNotNull(response);                                                    //Ensure response is not null
+        assertEquals(200, response.getStatusCode().value());                //Check status code
+        assertEquals(userDTO, response.getBody());                                  //Verify response body
+        verify(userService).registerNewUser(userDTO);                               //Verify service call
     }
 
-    //Test for registration failure when email already exists
-    @Test
-    public void testRegisterNewUser_EmailAlreadyExists() 
+    @Test   //Test view profile by ID
+    void ViewUserProfile_ShouldReturnUserDTO() 
     {
-        String email = userDTO.getEmail();  //Gets test email
-        when(userService.RegisterNewUser(any(UserDTO.class))).thenThrow(new EmailAlreadyExistsException(email));    //Mocks exception throw
-
-        //Asserts exception is thrown
-        EmailAlreadyExistsException ex = assertThrows(EmailAlreadyExistsException.class, () -> userController.RegisterNewUser(userDTO));      
-        assertEquals(email + " already exists in database", ex.getMessage());                               //Validates exception message
-        verify(userService, times(1)).RegisterNewUser(any(UserDTO.class));  //Verifies service method call
+        Long userId = 1L;                                                           //Test ID
+        when(userService.viewUserProfile(userId)).thenReturn(userDTO);              //Mock return
+        ResponseEntity<UserDTO> response = userController.ViewUserProfile(userId);  //Call controller
+        assertNotNull(response);                                                    //Assert non-null
+        assertEquals(200, response.getStatusCode().value());                //Assert status
+        assertEquals(userDTO, response.getBody());                                  //Assert body
+        verify(userService).viewUserProfile(userId);                                //Verify call
     }
 
-    //Test for successfully getting current user info
-    @Test
-    public void testGetCurrentUser_Success() 
+    @Test   //Test view all users
+    void ViewUserProfiles_ShouldReturnListOfUsers() 
     {
-        when(userService.getCurrentUser()).thenReturn(userDTO);                 //Mocks service response
-        ResponseEntity<UserDTO> response = userController.getCurrentUser();     //Calls controller
-        assertEquals(HttpStatus.OK, response.getStatusCode());                  //Asserts 200 OK
-        assertEquals(userDTO, response.getBody());                              //Asserts user data
-        verify(userService, times(1)).getCurrentUser(); //Verifies service method call
+        List<UserDTO> userList = List.of(userDTO);                                  //Mock list
+        when(userService.viewUserProfiles()).thenReturn(userList);                  //Stub method
+        ResponseEntity<List<UserDTO>> response = userController.ViewUserProfiles(); //Call controller
+        assertNotNull(response);                                                    //Assert not null
+        assertEquals(200, response.getStatusCode().value());                //Assert HTTP OK
+        assertEquals(userList, response.getBody());                                 //Assert body match
+        verify(userService).viewUserProfiles();                                     //Verify service
     }
 
-    //Test when getting current user throws an exception
-    @Test
-    public void testGetCurrentUser_Failure() 
+    @Test   //Test update user profile
+    void updateUserProfile_ShouldUpdateAndReturnAuthResponse() 
     {
-        when(userService.getCurrentUser()).thenThrow(new RuntimeException("Service Error"));    //Mocks exception
-
-        //Asserts exception is thrown
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userController.getCurrentUser());                    
-        assertEquals("Service Error", exception.getMessage());              //Validates message
-        verify(userService, times(1)).getCurrentUser();     //Verifies service call
+        Long userId = 1L;                                                                               //Test user ID
+        when(userService.updateUserProfile(userId, userDTO)).thenReturn(authResponseDTO);               //Stub
+        ResponseEntity<AuthResponseDTO> response = userController.updateUserProfile(userId, userDTO);   //Call
+        assertNotNull(response);                                                                        //Assert not null
+        assertEquals(200, response.getStatusCode().value());                                    //Status check
+        assertEquals(authResponseDTO, response.getBody());                                              //Response check
+        verify(userService).updateUserProfile(userId, userDTO);                                         //Verify call
     }
 
-    //Test for viewing a user profile successfully
-    @Test
-    public void testViewUserProfile_Success() 
+    @Test   //Test delete user
+    void deleteUserProfile_ShouldReturnNoContent() 
     {
-        when(userService.ViewUserProfile(anyLong())).thenReturn(userDTO);                   //Mocks service return
-        ResponseEntity<UserDTO> response = userController.ViewUserProfile(1L);      //Calls controller method
-        assertEquals(HttpStatus.OK, response.getStatusCode());                              //Asserts 200 OK
-        assertEquals(userDTO, response.getBody());                                          //Asserts response body
-        verify(userService, times(1)).ViewUserProfile(1L);  //Verifies service call
+        Long userId = 1L;                                                           //ID to delete
+        doNothing().when(userService).deleteUserProfile(userId);                    //Mock void call
+        ResponseEntity<Void> response = userController.deleteUserProfile(userId);   //Call
+        assertNotNull(response);                                                    //Assert not null
+        assertEquals(204, response.getStatusCode().value());                //Expect No Content
+        verify(userService).deleteUserProfile(userId);                              //Verify call
     }
 
-    //Test when viewing a user profile with invalid ID throws an exception
-    @Test
-    public void testViewUserProfile_UserNotFound() 
+    @Test   //Test null input to registration
+    void RegisterNewUser_NullInput_ShouldThrowException() 
     {
-        Long userId = 1L;   //Sets test user ID
-        when(userService.ViewUserProfile(userId)).thenThrow(new UserNotFoundException(userId.toString()));  //Mocks exception
-
-        //Asserts exception thrown
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class,() -> userController.ViewUserProfile(userId));             
-        assertEquals("User ID " + userId + " not found", exception.getMessage());           //Validates message
-        verify(userService, times(1)).ViewUserProfile(userId);  //Verifies method call
+        when(userService.registerNewUser(null)).thenThrow(new NullPointerException("UserDTO is null")); //Mock error
+        NullPointerException ex = assertThrows(NullPointerException.class, () -> userController.RegisterNewUser(null)); //Expect exception
+        assertEquals("UserDTO is null", ex.getMessage());   //Check message
+        verify(userService).registerNewUser(null);          //Verify call
     }
 
-    //Test for viewing all user profiles
-    @Test
-    public void testViewUserProfiles_Success() 
+    @Test   //Test profile not found
+    void ViewUserProfile_UserNotFound_ShouldThrowException() 
     {
-        List<UserDTO> users = Collections.singletonList(userDTO);                       //Creates a single-item list
-        when(userService.ViewUserProfiles()).thenReturn(users);                         //Mocks return
-        ResponseEntity<List<UserDTO>> response = userController.ViewUserProfiles();     //Calls controller
-        assertEquals(HttpStatus.OK, response.getStatusCode());                          //Asserts 200 OK
-        assertEquals(users, response.getBody());                                        //Asserts body match
-        verify(userService, times(1)).ViewUserProfiles();   //Verifies call
+        Long userId = 99L;  //Invalid ID
+        when(userService.viewUserProfile(userId)).thenThrow(new RuntimeException("User not found"));    //Mock
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userController.ViewUserProfile(userId));    //Expect
+        assertEquals("User not found", exception.getMessage()); //Message match
+        verify(userService).viewUserProfile(userId);                    //Verify call
     }
 
-    //Test for successful update of user profile
-    @Test
-    public void testUpdateUserProfile_Success() 
+    @Test   //Test empty user list
+    void ViewUserProfiles_EmptyList_ShouldReturnEmptyList() 
     {
-        //Builds expected response DTO
-        AuthResponseDTO authResponseDTO = AuthResponseDTO.builder().userId(userDTO.getUserId()).firstName(userDTO.getFirstName()).lastName(userDTO.getLastName())
-        .phone(userDTO.getPhone()).address(userDTO.getAddress()).email(userDTO.getEmail()).username(userDTO.getUsername()).role(userDTO.getRole())
-        .token("mock-token").message("Bearer").build();
-
-        when(userService.UpdateUserProfile(eq(1L), any(UserDTO.class))).thenReturn(authResponseDTO);    //Mocks service
-        ResponseEntity<AuthResponseDTO> response = userController.UpdateUserProfile(1L, userDTO);           //Calls controller
-        assertEquals(HttpStatus.OK, response.getStatusCode());      //Asserts 200 OK
-        assertEquals(authResponseDTO, response.getBody());          //Asserts body match
-        verify(userService, times(1)).UpdateUserProfile(eq(1L), any(UserDTO.class));    //Verifies call
+        when(userService.viewUserProfiles()).thenReturn(List.of());                 //Empty list
+        ResponseEntity<List<UserDTO>> response = userController.ViewUserProfiles(); //Call
+        assertNotNull(response);                                                    //Not null
+        assertEquals(200, response.getStatusCode().value());                //Status OK
+        assertTrue(response.getBody().isEmpty());                                   //List empty
+        verify(userService).viewUserProfiles();                                     //Verify
     }
 
-    //Test when updating user profile with invalid ID throws exception
-    @Test
-    public void testUpdateUserProfile_UserNotFound() 
+    @Test   //Test update fails (user not found)
+    void updateUserProfile_UserNotFound_ShouldThrowException() 
     {
-        Long userId = 1L;   //Sets user ID
-        when(userService.UpdateUserProfile(eq(userId), any(UserDTO.class))).thenThrow(new UserNotFoundException(userId.toString()));    //Mocks exception
-
-        //Asserts exception thrown
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.UpdateUserProfile(userId, userDTO)); 
-        assertEquals("User ID " + userId + " not found", exception.getMessage());                                           //Validates message
-        verify(userService, times(1)).UpdateUserProfile(eq(userId), any(UserDTO.class));    //Verifies call
+        Long userId = 99L;  //Invalid
+        when(userService.updateUserProfile(userId, userDTO)).thenThrow(new RuntimeException("User not found")); //Mock
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userController.updateUserProfile(userId, userDTO)); //Expect
+        assertEquals("User not found", exception.getMessage()); //Message
+        verify(userService).updateUserProfile(userId, userDTO);         //Verify
     }
 
-    //Test for successful deletion of user profile
-    @Test
-    public void testDeleteUserProfile_Success() 
+    @Test   //Test delete fails (user not found)
+    void deleteUserProfile_UserNotFound_ShouldThrowException() 
     {
-        doNothing().when(userService).DeleteUserProfile(1L);                            //Mocks void method
-        ResponseEntity<Void> response = userController.DeleteUserProfile(1L);           //Calls controller
-        assertEquals(HttpStatus.NO_CONTENT, response.getStatusCode());                          //Asserts 204 No Content
-        assertNull(response.getBody());                                                         //Asserts no response body
-        verify(userService, times(1)).DeleteUserProfile(1L);    //Verifies call
-    }
-
-    //Test when deleting a user that does not exist
-    @Test
-    public void testDeleteUserProfile_UserNotFound() 
-    {
-        Long userId = 1L;  //Sets test ID
-        doThrow(new UserNotFoundException(userId.toString())).when(userService).DeleteUserProfile(userId);  //Mocks exception
-        UserNotFoundException exception = assertThrows(UserNotFoundException.class, () -> userController.DeleteUserProfile(userId));    //Asserts exception
-        assertEquals("User ID " + userId + " not found", exception.getMessage());                           //Validates message
-        verify(userService, times(1)).DeleteUserProfile(userId);                    //Verifies method call
-    }
-
-    //Test when deletion throws a runtime error
-    @Test
-    public void testDeleteUserProfile_DeletionError() 
-    {
-        Long userId = 1L;   //Sets user ID
-        doThrow(new RuntimeException("Deletion failed")).when(userService).DeleteUserProfile(userId);   //Mocks exception
-        RuntimeException exception = assertThrows(RuntimeException.class, () -> userController.DeleteUserProfile(userId));  //Asserts exception
-        assertEquals("Deletion failed", exception.getMessage());                                        //Validates message
-        verify(userService, times(1)).DeleteUserProfile(userId);                        //Verifies method call
+        Long userId = 99L;  //Invalid ID
+        doThrow(new RuntimeException("User not found")).when(userService).deleteUserProfile(userId);    //Mock
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> userController.deleteUserProfile(userId));  //Expect
+        assertEquals("User not found", exception.getMessage()); //Message check
+        verify(userService).deleteUserProfile(userId);                  //Verify
     }
 }

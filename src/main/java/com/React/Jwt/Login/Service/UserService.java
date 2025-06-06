@@ -1,196 +1,123 @@
-package com.React.Jwt.Login.Service;                                                    //Package declaration
-import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;                                    //Import Data Transfer Object for authentication responses
-import com.React.Jwt.Login.DTO.UserDTO;                                                 //Import Data Transfer Object for User entity
-import com.React.Jwt.Login.Entity.User;                                                 //Import User entity class  
-import com.React.Jwt.Login.Exception.*;                                                 //Import custom exceptions used in the service                  
-import com.React.Jwt.Login.Interface.UserInterface;                                     //Import UserInterface defining the service contract
-import com.React.Jwt.Login.Mapper.UserMapper;                                           //Import Mapper class to convert between User entity and DTO
-import com.React.Jwt.Login.Repository.UserRepository;                                   //Import Repository interface to access User persistence
-import com.React.Jwt.Login.Security.JWT.JwtUtil;                                        //Import JWT utility class for token generation
-import lombok.RequiredArgsConstructor;                                                  //Lombok annotation to generate constructor with required (final) fields
-import org.springframework.security.access.AccessDeniedException;                       //Spring Security exception for access denied scenarios
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; //Spring Security authentication token implementation
-import org.springframework.security.core.Authentication;                                //Spring Security authentication interface
-import org.springframework.security.core.GrantedAuthority;                              //Spring Security authority interface
-import org.springframework.security.core.authority.SimpleGrantedAuthority;              //Implementation of GrantedAuthority with simple role string
-import org.springframework.security.core.context.SecurityContextHolder;                 //Access to Spring Security context holder for auth info
-import org.springframework.security.crypto.password.PasswordEncoder;                    //Interface to encode passwords securely
-import org.springframework.stereotype.Service;                                          //Spring stereotype annotation to mark this class as a service component
-import java.util.*;                                                                     //Import utilities like Optional, List, Objects, etc.
-import java.util.stream.Collectors;                                                     //Import Collectors for stream processing
+package com.React.Jwt.Login.Service;                                                    //Package declaration for user-related service classes
+import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;                                    //Import DTO for authentication response (includes JWT token and user data)
+import com.React.Jwt.Login.DTO.UserDTO;                                                 //Import DTO for transferring user data between layers
+import com.React.Jwt.Login.Entity.User;                                                 //Import User entity representing the user table in the database
+import com.React.Jwt.Login.Exception.*;                                                 //Import all custom exception classes used in this service
+import com.React.Jwt.Login.Mapper.UserMapper;                                           //Import mapper to convert between User entity and UserDTO
+import com.React.Jwt.Login.Repository.UserRepository;                                   //Import repository interface for User entity CRUD operations
+import com.React.Jwt.Login.Security.JWT.JwtUtil;                                        //Import utility class for creating and managing JWT tokens
+import lombok.RequiredArgsConstructor;                                                  //Lombok annotation to auto-generate constructor for all final fields
+import org.springframework.security.access.AccessDeniedException;                       //Import exception thrown when a user lacks permission
+import org.springframework.security.core.GrantedAuthority;                              //Interface representing an authority granted to an Authentication object (e.g., a role)
+import org.springframework.security.core.authority.SimpleGrantedAuthority;              //Implementation of GrantedAuthority for a simple string-based role or authority
+import org.springframework.security.core.context.SecurityContextHolder;                 //Import SecurityContextHolder to retrieve or modify current user's authentication
+import org.springframework.security.crypto.password.PasswordEncoder;                    //Import interface for password hashing and verification
+import org.springframework.stereotype.Service;                                          //Marks this class as a Spring-managed service component
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken; //Import Spring Security class to create an authentication token
+import org.springframework.security.core.Authentication;                                //Import Spring Security interface representing an authenticated principal
+import java.util.*;                                                                     //Import core Java utility classes (e.g., List, Optional, etc.)
+import java.util.stream.Collectors;                                                     //Import stream API for functional-style collection operations
 
-@Service                    //Mark this class as a Spring service bean
-@RequiredArgsConstructor    //Lombok annotation to automatically generate a constructor with all final fields (for dependency injection)
-public class UserService implements UserInterface 
+@Service                    //Marks this as a Spring service bean
+@RequiredArgsConstructor    //Lombok annotation for constructor injection of final fields
+public class UserService 
 {
-    private final JwtUtil JwtUtil;                //JWT utility to generate and validate JWT tokens
-    private final UserRepository userRepository;    //Repository to interact with User persistence (database)
-    private final UserMapper userMapper;            //Mapper to convert User entity <-> UserDTO
-    private final PasswordEncoder passwordEncoder;  //Password encoder to hash user passwords securely
+    private final UserRepository userRepository;                        //Repository for user data access
+    private final UserMapper userMapper;                                //Mapper to convert between User entity and DTO
+    private final PasswordEncoder passwordEncoder;                      //Password encoder for hashing passwords
+    private final JwtUtil jwtUtil;                                      //JWT utility for token generation
+    private final UserAuthService userAuthService;                      //Service for authenticated user details
+    private final UserAuthorizationService userAuthorizationService;    //Service for authorization checks
 
-    //Create a new user with validations for username and email uniqueness
-    @Override
-    public UserDTO RegisterNewUser(UserDTO userDTO) 
+    //Register a new user with validation and password encoding
+    public UserDTO registerNewUser(UserDTO userDTO) 
     {
-        //Check if username already exists in repository, throw exception if yes
+        //Check if username already exists
         if(userRepository.existsByUsername(userDTO.getUsername()))
             throw new UsernameAlreadyExistsException(userDTO.getUsername());
 
-        //Check if email already exists in repository, throw exception if yes
+        //Check if email already exists
         if(userRepository.existsByEmail(userDTO.getEmail()))
             throw new EmailAlreadyExistsException(userDTO.getEmail());
 
-        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword())); //Encode (hash) the user's password before saving
-        User savedUser = userRepository.save(userMapper.toEntity(userDTO)); //Convert DTO to entity and save user in the repository
-        return userMapper.toDTO(savedUser);                                 //Convert saved entity back to DTO and return
+        userDTO.setPassword(passwordEncoder.encode(userDTO.getPassword())); //Encode password before saving
+        User savedUser = userRepository.save(userMapper.toEntity(userDTO)); //Save new user entity
+        return userMapper.toDTO(savedUser);                                  //Return saved user as DTO
     }
 
-    //Retrieve a user by userId with authorization check
-    @Override
-    public UserDTO ViewUserProfile(Long userId) 
+    //View a user's profile by ID with authorization check
+    public UserDTO viewUserProfile(Long userId) 
     {
-        authorizeUserOrAdmin(userId);                   //Check if current user is authorized (self or admin)
-        return userMapper.toDTO(findUserById(userId));  //Find user entity by ID and convert to DTO for returning
+        userAuthorizationService.authorizeUserOrAdmin(userId);  //Authorize if current user is admin or the user themselves
+        return userMapper.toDTO(findUserById(userId));          //Retrieve user entity and map to DTO
     }
 
-    //Retrieve list of all users, only accessible by admins
-    @Override
-    public List<UserDTO> ViewUserProfiles() 
+    //View all user profiles, only accessible by admin
+    public List<UserDTO> viewUserProfiles() 
     {
-        authorizeAdmin();   //Authorize only admins for this operation
-        
-        //Fetch all users, map each to DTO, and collect to list
-        return userRepository.findAll().stream().map(userMapper::toDTO).collect(Collectors.toList());
+        userAuthorizationService.authorizeAdmin();                                                      //Authorize admin access only
+        return userRepository.findAll().stream().map(userMapper::toDTO).collect(Collectors.toList());   //Retrieve all users, convert to DTO list
     }
 
-    //Update user profile info and roles, with authorization checks and token regeneration
-    @Override
-    public AuthResponseDTO UpdateUserProfile(Long userId, UserDTO userDTO) 
+    //Update user profile with authorization, partial update, and token refresh
+    public AuthResponseDTO updateUserProfile(Long userId, UserDTO userDTO) 
     {
-        User currentUser = getAuthenticatedUser();                          //Get current authenticated user entity
-        User userToUpdate = findUserById(userId);                           //Retrieve user entity to update by ID
-        boolean isAdmin = hasRole("ROLE_ADMIN");                    //Check if current user has admin role
-        boolean isSelf = Objects.equals(userId, currentUser.getUserId());   //Check if current user is updating own profile
+        User currentUser = userAuthService.getAuthenticatedUser();  //Get currently authenticated user entity
+        User userToUpdate = findUserById(userId);                   //Find user to update by ID
 
-        //Authorization: only admin or self can update the user
-        if(!isAdmin && !isSelf) 
+        //Check roles
+        boolean isAdmin = userAuthService.hasRole("ROLE_ADMIN");
+        boolean isSelf = Objects.equals(userId, currentUser.getUserId());
+
+        //Deny access if not admin or self
+        if(!isAdmin && !isSelf)
             throw new AccessDeniedException("You are not authorized to update this user.");
 
-        //Update allowed fields if present and not empty (self and admin can do this)
+        //Conditionally update fields if provided and non-empty
         Optional.ofNullable(userDTO.getFirstName()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setFirstName);
         Optional.ofNullable(userDTO.getLastName()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setLastName);
         Optional.ofNullable(userDTO.getUsername()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setUsername);
         Optional.ofNullable(userDTO.getEmail()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setEmail);
         Optional.ofNullable(userDTO.getPhone()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setPhone);
         Optional.ofNullable(userDTO.getAddress()).filter(s -> !s.trim().isEmpty()).ifPresent(userToUpdate::setAddress);
+        
+        //Encode password if updated
         Optional.ofNullable(userDTO.getPassword()).filter(s -> !s.trim().isEmpty()).ifPresent(pwd -> userToUpdate.setPassword(passwordEncoder.encode(pwd)));
 
-        //Only admins can update the role field
-        if(isAdmin && userDTO.getRole() != null) 
+        //Only admin can update roles
+        if(isAdmin && userDTO.getRole() != null)
             userToUpdate.setRole(userDTO.getRole());
- 
-        User updatedUser = userRepository.save(userToUpdate);       //Save updated user entity to repository
-        UserDTO updatedUserDTO = userMapper.toDTO(updatedUser);     //Convert updated user entity to DTO
-        List<String> roles = List.of(updatedUser.getRole().name()); //Create a list with single role name for token generation
 
-        //Generate a new JWT token with updated username and roles
-        String token = JwtUtil.generateToken(updatedUser.getUsername(), roles);
+        User updatedUser = userRepository.save(userToUpdate);       //Save updated user entity
+        UserDTO updatedUserDTO = userMapper.toDTO(updatedUser);     //Convert updated user to DTO
+        List<String> roles = List.of(updatedUser.getRole().name()); //Prepare roles list for token generation
+        String token = jwtUtil.generateToken(updatedUser.getUsername(), roles);                                                     //Generate new JWT token with updated roles
+        List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());          //Create authorities list from roles
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUser.getUsername(), null, authorities); //Create new authentication token with updated authorities
+        SecurityContextHolder.getContext().setAuthentication(newAuth);                                                              //Update security context with new authentication
 
-        //Prepare new authorities from roles for Spring Security context update
-        List<GrantedAuthority> authorities = roles.stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
-        
-        //Create new authentication token with updated roles
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(updatedUser.getUsername(), null,authorities
-        );
-        //Update Spring Security context with new authentication to immediately reflect changes
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
-
-        //Build and return authentication response with updated user info and token
+        //Build and return authentication response DTO with updated info and token
         return AuthResponseDTO.builder().userId(updatedUser.getUserId()).firstName(updatedUserDTO.getFirstName()).lastName(updatedUserDTO.getLastName())
         .phone(updatedUserDTO.getPhone()).address(updatedUserDTO.getAddress()).email(updatedUserDTO.getEmail()).username(updatedUserDTO.getUsername())
         .token(token).message("User updated successfully").role(updatedUserDTO.getRole()).build();
     }
 
-    //Delete a user by userId, only accessible by admins
-    @Override
-    public void DeleteUserProfile(Long userId) 
+    //Delete user profile by ID, admin only
+    public void deleteUserProfile(Long userId) 
     {
-        authorizeAdmin();                   //Ensure only admin can delete users
+        userAuthorizationService.authorizeAdmin();  //Authorize admin access
         
-        //Check if user exists, throw if not found
+        //Throw exception if user does not exist
         if(!userRepository.existsById(userId))
             throw new UserNotFoundException(userId.toString());
-
-        userRepository.deleteById(userId);  //Delete user from repository by ID
-    }
-
-    //Retrieve currently authenticated username from security context
-    public String getAuthenticatedUsername() 
-    {
-        //Get current authentication object
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         
-        //Throw if not authenticated
-        if(auth == null || !auth.isAuthenticated())
-            throw new AccessDeniedException("User not authenticated");
-        
-        return auth.getName();  //Return the username (principal name)
+        userRepository.deleteById(userId);          //Delete user by ID
     }
 
-    //Retrieve currently authenticated user's details as a UserDTO
-    public UserDTO getCurrentUser() 
-    {
-        User user = findUserByUsername(getAuthenticatedUsername()); //Find user entity by current username
-        return userMapper.toDTO(user);                              //Convert entity to DTO and return
-    }
-
-    //Authorize access only if current user has admin role
-    private void authorizeAdmin() 
-    {
-        if(!hasRole("ROLE_ADMIN"))
-            throw new AccessDeniedException("Only admins can access this resource.");
-    }
-
-    //Authorize access if current user is admin or requesting their own data
-    private void authorizeUserOrAdmin(Long userId) 
-    {
-        User currentUser = getAuthenticatedUser();
-
-        //Check if current user ID matches requested userId
-        boolean isSelf = Objects.equals(userId, currentUser.getUserId());
-        
-        //Throw exception if not admin and not self
-        if(!isSelf && !hasRole("ROLE_ADMIN"))
-            throw new AccessDeniedException("You are not authorized to access this data.");
-    }
-
-    //Check if currently authenticated user has a specific role
-    private boolean hasRole(String roleName) 
-    {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        
-        //Return false if no authentication or no authorities present
-        if(auth == null || auth.getAuthorities() == null) return false;
-        
-        //Check if any granted authority matches the requested role
-        return auth.getAuthorities().stream().map(GrantedAuthority::getAuthority).anyMatch(role -> role.equals(roleName));
-    }
-
-    //Retrieve currently authenticated user entity from repository
-    public User getAuthenticatedUser() 
-    {
-        return findUserByUsername(getAuthenticatedUsername());
-    }
-
-    //Find User entity by userId or throw UserNotFoundException if not found
+    //Helper method to find user by ID or throw exception
     private User findUserById(Long userId) 
     {
+        //Find user or throw not found exception
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException(userId.toString()));
-    }
-
-    //Find User entity by username or throw UsernameNotFoundException if not found
-    private User findUserByUsername(String username) 
-    {
-        return userRepository.findByUsername(username).orElseThrow(() -> new UsernameNotFoundException(username));
     }
 }

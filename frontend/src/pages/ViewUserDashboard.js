@@ -49,11 +49,10 @@ export default function ViewUserDashboard()
     {
       try 
       {
-        const res = await axios.get("http://localhost:8080/users/me", 
+        const res = await axios.get("http://localhost:8080/me", 
         {
-          headers: { Authorization: `Bearer ${token}` },  //Auth token for current user
+        headers: {Authorization: `Bearer ${token}`},  //Auth token for current user
         });
-
         if(!isMounted) return;  //Prevent state updates if unmounted
 
         const user = res.data;  //Extract user data

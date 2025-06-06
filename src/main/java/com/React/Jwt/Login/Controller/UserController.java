@@ -1,66 +1,56 @@
-package com.React.Jwt.Login.Controller;                 //Define the package for this controller class
-import com.React.Jwt.Login.DTO.UserDTO;                 //Import the UserDTO class for data transfer
-import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;    //Import the AuthResponseDTO class for response after user updates
-import com.React.Jwt.Login.Service.UserService;         //Import the UserService class to handle business logic
-import lombok.RequiredArgsConstructor;                  //Lombok annotation to generate constructor for final fields
-import org.springframework.http.ResponseEntity;         //Import ResponseEntity for HTTP response handling
-import org.springframework.web.bind.annotation.*;       //Import Spring Web annotations for defining REST endpoints
-import java.util.List;                                  //Import List collection for multiple users
+package com.React.Jwt.Login.Controller;                 //Package declaration for the user controller
+import com.React.Jwt.Login.DTO.Auth.AuthResponseDTO;    //Importing DTO for authentication responses
+import com.React.Jwt.Login.DTO.UserDTO;                 //Importing DTO for user data transfer
+import com.React.Jwt.Login.Service.UserService;         //Importing service handling user-related operations
+import lombok.RequiredArgsConstructor;                  //Lombok annotation to auto-generate constructor for final fields
+import org.springframework.http.ResponseEntity;         //Spring wrapper for HTTP responses
+import org.springframework.web.bind.annotation.*;       //Spring annotations for REST controllers and request mapping
+import java.util.List;                                  //Import List interface for collections
 
-@CrossOrigin(origins = "http://localhost:3000")     //Enable Cross-Origin Resource Sharing for frontend on localhost:3000
-@RestController                                     //Mark this class as a REST controller
-@RequestMapping("/users")                           //Base path for all endpoints in this controller
-@RequiredArgsConstructor                            //Generate constructor for injecting dependencies (UserService)
+@RestController             //Marks the class as a REST controller
+@RequestMapping("/users")   //Base URL mapping for this controller's endpoints
+@RequiredArgsConstructor    //Lombok annotation for constructor injection of final fields
 public class UserController 
 {
-    private final UserService userService;  //Inject UserService to handle user-related operations
+    private final UserService userService;  //Injected service for user operations
 
-    //Handle POST request to create a new user
-    @PostMapping
+    //Handles POST requests to /users/register to register a new user
+    @PostMapping("/register")
     public ResponseEntity<UserDTO> RegisterNewUser(@RequestBody UserDTO userDTO) 
     {
-        UserDTO createdUser = userService.RegisterNewUser(userDTO); //Call service to create user and return result
-        return ResponseEntity.ok(createdUser);                      //Respond with created user
+        UserDTO registeredUser = userService.registerNewUser(userDTO);  //Registers new user with data from request body
+        return ResponseEntity.ok(registeredUser);                       //Returns HTTP 200 OK with the registered user data
     }
 
-    //Handle GET request to fetch currently authenticated user
-    @GetMapping("/me")
-    public ResponseEntity<UserDTO> getCurrentUser() 
-    {
-        UserDTO currentUser = userService.getCurrentUser(); //Call service to get current user
-        return ResponseEntity.ok(currentUser);              //Respond with user data
-    }
-
-    //Handle GET request to fetch a user by ID
+    //Handles GET requests to /users/{userId} to view a specific user's profile
     @GetMapping("/{userId}")
-    public ResponseEntity<UserDTO> ViewUserProfile(@PathVariable("userId") Long userId) 
+    public ResponseEntity<UserDTO> ViewUserProfile(@PathVariable Long userId) 
     {
-        UserDTO user = userService.ViewUserProfile(userId); //Call service to get user by ID
-        return ResponseEntity.ok(user);                     //Respond with user data
+        UserDTO user = userService.viewUserProfile(userId); //Retrieves user profile by userId path variable
+        return ResponseEntity.ok(user);                     //Returns HTTP 200 OK with the user profile
     }
 
-    //Handle GET request to fetch all users
+    //Handles GET requests to /users to get all user profiles
     @GetMapping
     public ResponseEntity<List<UserDTO>> ViewUserProfiles() 
     {
-        List<UserDTO> users = userService.ViewUserProfiles();   //Call service to get list of users
-        return ResponseEntity.ok(users);                        //Respond with user list
+        List<UserDTO> users = userService.viewUserProfiles();   //Retrieves list of all user profiles
+        return ResponseEntity.ok(users);                        //Returns HTTP 200 OK with the list of users
     }
 
-    //Handle PATCH request to update user by ID
+    //Handles PATCH requests to /users/{userId} to update a user profile
     @PatchMapping("/{userId}")
-    public ResponseEntity<AuthResponseDTO> UpdateUserProfile(@PathVariable("userId") Long userId, @RequestBody UserDTO userDTO) 
+    public ResponseEntity<AuthResponseDTO> updateUserProfile(@PathVariable Long userId, @RequestBody UserDTO userDTO) 
     {
-        //Call service to update user and return auth response
-        AuthResponseDTO updatedUser = userService.UpdateUserProfile(userId, userDTO);
-        return ResponseEntity.ok(updatedUser);  //Respond with updated user info
+        AuthResponseDTO response = userService.updateUserProfile(userId, userDTO);  //Updates user profile and returns authentication response
+        return ResponseEntity.ok(response);                                         //Returns HTTP 200 OK with update response
     }
 
-    //Handle DELETE request to delete user by ID
+    //Handles DELETE requests to /users/{userId} to delete a user profile
     @DeleteMapping("/{userId}")
-    public ResponseEntity<Void> DeleteUserProfile(@PathVariable("userId") Long userId) 
+    public ResponseEntity<Void> deleteUserProfile(@PathVariable Long userId) 
     {
-        userService.DeleteUserProfile(userId);      //Call service to delete user
-        return ResponseEntity.noContent().build();  //Return 204 No Content
+        userService.deleteUserProfile(userId);      //Deletes user profile by userId
+        return ResponseEntity.noContent().build();  //Returns HTTP 204 No Content indicating successful deletion
     }
 }
