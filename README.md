@@ -283,11 +283,11 @@ jobs:
 ### Main Goal
 Promote validation and logic reuse across controllers and services by separating concerns.
 
-This is a good architectural decision, as it improves:
-    -   Maintainabilty.
-    -   Testability.
-    -   Reusability.
-    -   Clean separation of responsibilities.
+This is a good architectural decision, as it improves: <br>
+    -   Maintainabilty.<br>
+    -   Testability.<br>
+    -   Reusability.<br>
+    -   Clean separation of responsibilities.<br>
 
 ### User Services
 
