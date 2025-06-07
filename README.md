@@ -309,7 +309,7 @@ This is a good architectural decision, as it improves: <br>
 1. UserAuthService and UserAuthorizationService follow Single Responsibility Principle.
 2. Use of @RequiredConstructor improves clean constructor - based dependency injection.
 3. AuthService remained focus on authentication, not overloaded with authorization or user profile logic.
-4. Logical grouping of endpoints help React frontend integration (AuthService.js). reamined modular and clear.
+4. Logical grouping of endpoints help React frontend integration (AuthService.java). reamined modular and clear.
 5. Avoids controller bloat by spilting authentication from CRUD operations.
 6. Encourages reusability of UserAuthService.java within AuthController.java and UserAuthController.java.
 
