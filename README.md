@@ -278,3 +278,45 @@ jobs:
 1. Go to the Actions tab in your GitHub repository.
 2. You will see the workflow runs under the Workflow Runs section.
 3. Click on the workflow name (e.g., Backend CI or Frontend CI) to monitor the status, view logs, and troubleshoot if necessary.
+
+## Purpose Summary for Service and Controller Classes
+### Main Goal
+Promote validation and logic reuse across controllers and services by separating concerns.
+
+This is a good architectural decision, as it improves:
+    -   Maintainabilty.
+    -   Testability.
+    -   Reusability.
+    -   Clean separation of responsibilities.
+
+### User Services
+
+| Class                    | Responsibility                                                                                             |
+|--------------------------|------------------------------------------------------------------------------------------------------------|
+| UserService              | Business logic to handle user account management.                                                          |
+| UserAuthService          | Utility methods for logged - in user context, role verification,user lookup with exception handling.       |
+| UserAuthorizationService | Authorization checks, isolated from business logic using dependency injection and @RequiredArgsConstructor.|
+| AuthService              | Authentication purposes                                                                                    |
+
+### User Controllers
+| Class                    | Responsibility                                                       |
+|--------------------------|----------------------------------------------------------------------|
+| UserController           | Handles CRUD operations on user accounts via UserService.            |
+| UserAuthController       | Exposes endpoints to get info about the currently authenticated user.|
+| AuthController           | Handles login, token refresh, and password recovery.                 |
+
+### Notes
+1. UserAuthService and UserAuthorizationService follow Single Responsibility Principle.
+2. Use of @RequiredConstructor improves clean constructor - based dependency injection.
+3. AuthService remained focus on authentication, not overloaded with authorization or user profile logic.
+4. Logical grouping of endpoints help React frontend integration (AuthService.js). reamined modular and clear.
+5. Avoids controller bloat by spilting authentication from CRUD operations.
+6. Encourages reusability of UserAuthService.java within AuthController.java and UserAuthController.java.
+
+### Design Advantages
+| Benefits                        | Responsibility                                                   |
+|---------------------------------|------------------------------------------------------------------|
+| Separation of concerns          | Easy testing and debugging of individual components.             |
+| Validation Reusability          | Centralized logic in services like UserAuthService.              |
+| Role-Based Security Enforcement | Clear location for access rules (UserAuthorizationService).      |
+| Frontend Integration            | AuthController is isolated and tailored for frontend token flow. |
