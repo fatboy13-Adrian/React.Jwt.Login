@@ -1,9 +1,16 @@
 # User Management System (UMS)
 ## Overview
-UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSON Web Tokens)** for user authentication and authorization. It is designed as a plug-and-play module that can be integrated into any web-based application requiring user identity and access management.
+UMS is a **Role-Based Access Control (RBAC)** system with **JWT (JSON Web Tokens)** for authentication, designed as a plug-and-play module for web apps.
 
-## Software Architecture for UMS
+## Software Architecture
 <img src = "screenshots/React - JWT - Login Architecture.jpg" alt = "React-JWT-Login" width = "800">
+
+## ⚙️ Tech Stack
+### Backend
+Java, Spring Boot, Spring Security, JWT, JPA (Hibernate), H2 (dev), PostgreSQL (prod)
+
+### Frontend
+React, JavaScript, Axios, React Router, HTML/CSS
 
 ## ✨ Features
 - 🔐 **Role-Based Access Control (RBAC):** Authenticate users based on predefined roles such as `USER` or `ADMIN`.
@@ -11,22 +18,6 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 - 🛡️ **Strict Authorization:** Users can only view or modify their own data, while admins can manage all users.
 - 🔄 **Real-time Sync:** Seamless interaction between React frontend and Spring Boot backend APIs.
 - 🌐 **RESTful APIs:** Easy integration for frontend/backend communication.
-
-## ⚙️ Tech Stack
-### Backend
-    -   Java Spring Boot
-    -   Spring Security
-    -   JSON Web Token (JWT)
-    -   Hibernate / Java Persistence API (JPA)
-    -   H2 Database (for testing/development)
-    -   PostgreSQL Database (for production)
-
-### Frontend
-    -   React
-    -   JavaScript
-    -   HTML & CSS
-    -   Axios
-    -   React Router DOM
 
 ## Installation Procedures
 1. **Clone Repository**<br>
@@ -60,42 +51,16 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
     -   Frontend stores token + role + userId in localStorage
     -   Axios sends token in headers for all future requests
 
-## Problems Faced During Development
-1. **Backend**<br>
-    -   Token validation and secure endpoint access
-    -   CORS restrictions in web browser
-    -   Data leakage across users
+## API Endpoints
 
-2. **Frontend**<br>
-    -   Handling authentication tokens between pages
-    -   Unauthorized route access
-    -   Passing dynamic userId
-
-## Actions Taken
-### Backend
-    -   Custom JWT filter annotations.
-    -   Configured CorsFilter to allow React frontend.
-    -   Enforced strict ownership rules in controller layer.
-
-### Frontend
-    -   Used localStorage and Axios interceptors.
-    -   Conditional rendering + role-based route protection.
-    -   Stored userId in localStorage post-login
-
-## Results
-    🔐 Authenticated routes reject invalid tokens
-    👤 Users can view/update only their profiles
-    🛡️ Admins have full access to user data
-    🔄 Frontend auto-updates based on API state
-    🚀 Responsive and modular design for easy extension
-
-## Sample API Endpoints
-    -   POST /auth/login: login with user credentials
-    -   POST /users/RegisterNewUser: register a new user
-    -   GET /users/ViewUserProfile/{userId}" view your own user profile
-    -   GET /users/ViewUserProfiles: view all user profiles
-    -   PATCH /users/UpdateUserProfile/{userId}: update your own user profile
-    -   DELETE /users/DeleteUserProfile/{userId}: Admin to delete user profile
+| Method | Endpoint                          | Description                       |
+|--------|-----------------------------------|-----------------------------------|
+| POST   | /auth/login                       | Authenticate user and receive JWT |
+| POST   | /users/RegisterNewUser            | Register a new user               |
+| GET    | /users/ViewUserProfile/{userId}   | Retrieve current user’s profile   |
+| GET    | /users/ViewUserProfiles           | Admin fetches all user profiles   |
+| PATCH  | /users/UpdateUserProfile/{userId} | User updates own profile          |
+| DELETE | /users/DeleteUserProfile/{userId} | Admin deletes a user profile      |
 
 ## Error Handling
 ### Common Error Codes
@@ -111,11 +76,28 @@ UMS is a secure **Role-Based Access Control (RBAC)** system that uses **JWT (JSO
 
 ### Running Tests
 
-### Run all tests for backend
-mvn test
+| Area     | Command  | 
+|----------|----------|
+| Backend  | mvn test | 
+| Frontend | npm test | 
 
-### Run all tests for frontend
-npm test
+## Problems Faced During Development and their Solution
+
+| Area               | Issues Faced                               | Solution                                                  |
+|--------------------|--------------------------------------------|-----------------------------------------------------------|
+| Backend            | JWT token validation                       | Created a custom filter to check JWT tokens.              |
+| Backend            | CORS restrictions                          | Added a CorsConfiguration bean to allow frontend requests.|
+| Backend            | Preventing data leaks between users        | Checked if logged-in user ID matches the requested ID.    |
+| Frontend           | Managing token across pages                | Stored the token in localStorage.                         |
+| Frontend           | Protecting routes from unauthorized access | Built routes that block access based on login or role.    |
+| Frontend           | Dynamic userId handling                    | Compared the user ID in URL with the logged-in user ID.   |
+
+## Results
+    🔐 Authenticated routes reject invalid tokens
+    👤 Users can view/update only their profiles
+    🛡️ Admins have full access to user data
+    🔄 Frontend auto-updates based on API state
+    🚀 Responsive and modular design for easy extension
 
 ## Docker and CI/CD for Spring Boot & React with GitHub Actions
 ### Backend (Spring Boot) Dockerization
