@@ -274,6 +274,35 @@ This is a good architectural decision, as it improves: <br>
     -   Reusability.<br>
     -   Clean separation of responsibilities.<br>
 
+## Load Testing with K6
+The project includes a load test script using K6 to evaulate the performance and correctness of a user authentication and management API.
+
+### How to Install K6
+1. Visit: https://dl.k6.io/msi/k6-latest-amd64.msi
+2. The installer will download automatically.
+3. Run the installer to complete the installation.
+
+### What It Tests?
+| Service           | Description                                                                                                        |
+|-------------------|--------------------------------------------------------------------------------------------------------------------|
+| User Login        | Logs in with admin credentials and retrieves an authentication token.                                              |
+| User Registration | Registers a new user with a unique username, email, and phone number to avoid constraint violations.               |
+| User Operations   | Retrieves the newly registered user's details, fetches all users, updates the user's profile, and deletes the user.|
+| Current User Info | Retrieves the logged-in user's username and verifies if the user has the ADMIN role.                               |
+
+### How to Run?
+1. Start backend server: mvn spring-boot:run
+2. Open to Windows PoweShell.
+3. Navigate to your project directory: cd "C:\Path\To\Your_Project_Folder\React.Jwt.Login"
+4. Run the test: k6 run loadtest.js
+
+### Test Output
+The script includes status checks for each API call. At the end of execution, k6 will display:
+    -   Number of passed/failed checks
+    -   HTTP durations (min/avg/max)
+    -   Total data sent/received
+    -   Error logs (e.g., registration failures)
+
 ### User Services
 
 | Class                    | Responsibility                                                                                             |
