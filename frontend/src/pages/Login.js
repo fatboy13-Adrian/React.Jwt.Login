@@ -41,10 +41,7 @@ const Login = () =>
       setSuccess("Login successful! Redirecting to dashboard...");
 
       //Redirect user to the dashboard after 5 seconds
-      setTimeout(() => 
-      {
-        navigate("/dashboard"); //Navigate to the dashboard route
-      }, 5000);
+      navigate("/dashboard"); //Navigate to the dashboard route
     } 
     
     catch(err) 

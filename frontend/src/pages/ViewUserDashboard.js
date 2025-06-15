@@ -134,7 +134,7 @@ export default function ViewUserDashboard()
 
       setDeleteSuccess("User deleted successfully. Refreshing list...");  //Show success message
       await fetchAllUsers(token, true);                                   //Refresh users list after deletion
-      setTimeout(() => setDeleteSuccess(""), 3000);                       //Clear success message after 3 seconds
+      setDeleteSuccess("");                                               //Clear success message
     } 
     
     catch(err) 

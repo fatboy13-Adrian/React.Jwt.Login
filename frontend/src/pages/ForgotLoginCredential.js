@@ -66,12 +66,12 @@ export default function ForgotLoginCredential()
       const data = await response.json(); //Parse the JSON response from the backend
 
       if(response.ok) 
-        {
+      {
         //If the response is successful, display success message
         setMessage(data.message || "Credentials reset successful! Redirecting to login...");
-        setError("");                               //Clear any errors
-        setSuccess(true);                           //Set success flag to true
-        setTimeout(() => navigate("/login"), 5000); //Redirect to login page after 5 seconds
+        setError("");       //Clear any errors
+        setSuccess(true);   //Set success flag to true
+        navigate("/login"); //Redirect to login page
       } 
       
       else 
